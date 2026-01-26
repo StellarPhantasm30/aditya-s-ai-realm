@@ -4,21 +4,7 @@ import { Award, Trophy, Star, BookOpen, Code, Medal, TrendingUp, Newspaper } fro
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 const certifications = [
-  {
-    title: "Google Generative AI",
-    type: "Certification",
-    icon: Award,
-    description: "Professional certification in Generative AI fundamentals and applications",
-    color: "from-blue-500 to-cyan-500",
-  },
-  {
-    title: "GitHub Foundations",
-    type: "Certification",
-    icon: Code,
-    description: "Certified in GitHub platform fundamentals and best practices",
-    color: "from-gray-600 to-gray-400",
-  },
-  {
+    {
     title: "Infosys Topaz AI Innovation",
     type: "Winner",
     icon: Trophy,
@@ -27,17 +13,31 @@ const certifications = [
   },
   {
     title: "IQE GenAI Hackathon",
-    type: "Winner - AWS",
-    icon: Medal,
+    type: "Winner",
+    icon: Trophy,
     description: "Winning solution using AWS services for GenAI application",
     color: "from-orange-500 to-red-500",
   },
   {
     title: "GFG Hack for Future",
     type: "Finalist",
-    icon: Star,
+    icon: Medal,
     description: "Top finalist in GeeksforGeeks nationwide hackathon",
     color: "from-green-500 to-emerald-500",
+  },
+  {
+    title: "Google Generative AI",
+    type: "Certification",
+    icon: BookOpen,
+    description: "Professional certification in Generative AI fundamentals and applications",
+    color: "from-blue-500 to-cyan-500",
+  },
+  {
+    title: "GitHub Foundations",
+    type: "Certification",
+    icon: BookOpen,
+    description: "Certified in GitHub platform fundamentals and best practices",
+    color: "from-gray-600 to-gray-400",
   },
   {
     title: "Employee of the Month",

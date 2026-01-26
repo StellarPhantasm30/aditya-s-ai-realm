@@ -74,7 +74,7 @@ const Hero = () => {
               transition={{ delay: 0.3 }}
               className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4"
             >
-              <span className="gradient-text">{`{Aditya Ravi Raj}`}</span>
+              <span className="gradient-text">{`Aditya Ravi Raj`}</span>
             </motion.h1>
 
             <motion.p
@@ -104,13 +104,16 @@ const Hero = () => {
               transition={{ delay: 0.6 }}
               className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
             >
-              <Button
-                size="lg"
-                className="group relative overflow-hidden bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity"
+              <a
+                href="/Aditya Ravi Raj.pdf"
+                download
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center text-base font-medium rounded-lg group relative overflow-hidden bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity px-6 py-3"
               >
                 <Download className="mr-2 h-5 w-5" />
                 Download CV
-              </Button>
+              </a>
 
               <Button
                 size="lg"
@@ -165,7 +168,11 @@ const Hero = () => {
                 transition={{ duration: 0.6, delay: 0.4 }}
               >
                 <div className="w-full h-full bg-gradient-to-br from-primary/30 to-accent/30 flex items-center justify-center">
-                  <span className="text-6xl font-bold gradient-text">AR</span>
+                  <img
+                    src="/profile_picture.jpeg"
+                    alt="Aditya Ravi Raj profile"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               </motion.div>
 

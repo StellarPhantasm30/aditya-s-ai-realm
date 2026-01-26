@@ -60,7 +60,7 @@ const Footer = () => {
               className="text-2xl font-bold gradient-text cursor-pointer inline-block mb-2"
               whileHover={{ scale: 1.05 }}
             >
-              Aditya.AI
+              NeuralNotes.AI
             </motion.a>
             <p className="text-muted-foreground text-sm">
               © {currentYear} Aditya Ravi Raj. All rights reserved.
@@ -78,15 +78,6 @@ const Footer = () => {
                 {link.label}
               </button>
             ))}
-          </div>
-
-          {/* Built with */}
-          <div className="text-center md:text-right">
-            <p className="text-muted-foreground text-sm">
-              Built with{" "}
-              <span className="text-red-500">❤</span>
-              {" "}using React & Tailwind
-            </p>
           </div>
         </div>
       </div>

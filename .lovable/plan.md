@@ -17,7 +17,7 @@ A modern, dark-themed AI engineer portfolio inspired by the reference design, sh
 
 ## 1. Navigation Bar
 Sticky top navigation with:
-- Logo/name: "Aditya.AI"
+- Logo/name: "NeuralNotes.AI"
 - Smooth-scroll links: About Me, Skills, Projects, Certifications, Ask My Bot, Contact
 - Subtle hover glow effects
 - Mobile hamburger menu

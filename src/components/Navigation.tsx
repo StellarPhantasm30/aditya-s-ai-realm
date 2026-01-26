@@ -53,7 +53,7 @@ const Navigation = () => {
             className="text-2xl font-bold gradient-text cursor-pointer"
             whileHover={{ scale: 1.05 }}
           >
-            Aditya.AI
+            NeuralNotes.AI
           </motion.a>
 
           {/* Desktop Navigation */}

@@ -82,7 +82,7 @@ const About = () => {
               </div>
               <div className="flex items-center gap-2 ml-4 text-muted-foreground text-sm">
                 <Terminal className="h-4 w-4" />
-                <span>aditya@portfolio ~ about</span>
+                <span>about</span>
               </div>
             </div>
 

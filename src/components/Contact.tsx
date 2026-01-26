@@ -1,6 +1,7 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import { Mail, MapPin, Linkedin, Github, BookOpen, ArrowRight } from "lucide-react";
+import { Mail, MapPin, ArrowRight } from "lucide-react";
+import { SiLinkedin, SiGithub, SiMedium, SiX, SiLeetcode, SiInstagram } from "react-icons/si";
 import { Button } from "@/components/ui/button";
 
 const Contact = () => {
@@ -10,21 +11,39 @@ const Contact = () => {
   const socialLinks = [
     {
       name: "LinkedIn",
-      icon: Linkedin,
-      href: "https://linkedin.com/in/adityaraviraj",
+      icon: SiLinkedin,
+      href: "https://linkedin.com/in/adityadev30",
       color: "hover:text-blue-500",
     },
     {
       name: "GitHub",
-      icon: Github,
-      href: "https://github.com/adityaraviraj",
-      color: "hover:text-gray-400",
+      icon: SiGithub,
+      href: "https://github.com/stellarphantasm30",
+      color: "hover:text-violet-400",
     },
     {
       name: "Medium",
-      icon: BookOpen,
-      href: "https://medium.com/@adityaraviraj",
+      icon: SiMedium,
+      href: "https://medium.com/@aditya_dev30",
       color: "hover:text-green-500",
+    },
+    {
+      name: "LeetCode",
+      icon: SiLeetcode,
+      href: "https://leetcode.com/aditya_dev30",
+      color: "hover:text-yellow-500",
+    },
+    {
+      name: "X",
+      icon: SiX,
+      href: "https://x.com/aditya_dev30",
+      color: "hover:text-black dark:hover:text-white",
+    },
+    {
+      name: "Instagram",
+      icon: SiInstagram,
+      href: "https://instagram.com/neuralnotes30",
+      color: "hover:text-pink-500",
     },
   ];
 
