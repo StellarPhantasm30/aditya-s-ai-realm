@@ -1,131 +1,147 @@
 
+# Enhancement Plan: Typewriter Effect, Skills Visualization & Certifications
 
-# Portfolio Website for Aditya Ravi Raj
-
-A modern, dark-themed AI engineer portfolio inspired by the reference design, showcasing expertise in Generative AI, LLMOps, and enterprise-scale AI systems.
-
----
-
-## Design Theme
-- **Dark navy/deep blue background** with electric blue and purple gradient accents
-- **Neon glow effects** on hover states and key elements
-- **Modern sans-serif typography** (Inter or similar)
-- **Smooth scroll animations** throughout
-- **Floating decorative elements** matching the reference aesthetic
+This plan addresses three key improvements to make your portfolio more visually striking and interactive.
 
 ---
 
-## 1. Navigation Bar
-Sticky top navigation with:
-- Logo/name: "NeuralNotes.AI"
-- Smooth-scroll links: About Me, Skills, Projects, Certifications, Ask My Bot, Contact
-- Subtle hover glow effects
-- Mobile hamburger menu
+## 1. Hero Typewriter Effect
+
+Add a dynamic typewriter effect that cycles through roles/titles with a realistic type-and-backspace animation.
+
+### How it will work:
+- Text types character by character with natural timing
+- Pauses at the end of each phrase (2 seconds)
+- Backspaces to erase the text character by character
+- Types the next phrase in the rotation
+- Cycles infinitely through all phrases
+
+### Phrases to cycle:
+1. "Aditya Ravi Raj"
+2. "a Senior AI Engineer"
+3. "a GenAI Specialist"
+4. "an LLMOps Expert"
+
+### Visual appearance:
+- Blinking cursor at the end of text
+- Gradient text styling maintained
+- Smooth transitions between typing states
 
 ---
 
-## 2. Hero Section
-Split layout matching the reference:
-- **Left side**: 
-  - "Hi, I am" greeting with `{Aditya Ravi Raj}` in accent color
-  - Tagline: Senior AI Engineer | Generative AI | LLMOps | Agentic Systems
-  - Brief professional summary
-- **Right side**: 
-  - Profile photo with abstract paint-stroke blob background
-  - Floating decorative elements (circles, dots)
-- **CTA Buttons**: Download CV + Start a Project (styled with gradient borders)
+## 2. Skills Section - Desktop Visualization Redesign
+
+Transform the current basic node layout into an aesthetic neural network visualization matching your reference images.
+
+### New Layout Design:
+```text
+                    [Programming & Databases]
+                            |
+       [Cloud & DevOps]-----+-----[Backend & APIs]
+              \             |            /
+               \    [Generative AI & ML] /
+                \         |           /
+       [Architecture]----+----[LLMOps / MLOps]
+```
+
+### Visual Improvements:
+1. **Larger, more prominent nodes** (80x80px) with gradient ring borders
+2. **Color-coded ring around each node** matching category colors
+3. **Icons displayed inside nodes** with white background
+4. **Fixed connection lines** (not random) - logical connections between related skills
+5. **Smooth animated lines** with gradient/glow effect
+6. **Hover tooltip** showing skill name with level/proficiency bar
+
+### Hover Behavior:
+- Node glows with category color
+- Popup panel appears with:
+  - Category name in gradient text
+  - List of technologies as styled chips
+  - Subtle glass effect background
+
+### Connection Logic (fixed, not random):
+- Programming connects to Backend, GenAI, Cloud
+- Backend connects to Cloud, LLMOps
+- Cloud connects to LLMOps, Architecture
+- GenAI connects to LLMOps, Architecture
+- Architecture connects to all (central practices)
 
 ---
 
-## 3. About Me Section
-Terminal-style floating card featuring:
-- Animated typing effect with cursor
-- Full professional summary covering Synechron, Infosys experience
-- Highlights: LLMOps, RBAC, observability, Agentic RAG expertise
-- Abstract decorative elements on the side
+## 3. Certifications Section - Thumbnail Gallery with Modal
+
+Redesign the certifications section to display certificate thumbnails in a stacked/perspective layout with click-to-view functionality.
+
+### Visual Layout (matching reference):
+- Certificates displayed at slight angles creating depth
+- Connected by a flowing curved line with dots at connection points
+- Center certificate is larger/focused
+- Side certificates are smaller with perspective tilt
+
+### Card Structure:
+```text
++---------------------------+
+|  [Thumbnail Image]        |
+|  Certificate preview      |
++---------------------------+
+|  Badge: "Winner"          |
+|  Title: "Infosys Topaz"   |
+|  Description text         |
++---------------------------+
+```
+
+### Click Behavior:
+- Clicking anywhere on the card opens a modal dialog
+- Modal displays the full certificate image at large size
+- Modal has a close button and dark overlay
+- Smooth animation on open/close
+
+### Certificate File Structure:
+Certificates stored at `/public/certifications/`:
+- `infosys-topaz-ai.png`
+- `iqe-genai-hackathon.png`
+- `gfg-hack-for-future.png`
+- `google-generative-ai.png`
+- `github-foundations.png`
+- `employee-of-month.png`
+- `leetcode-achievements.png`
+- `technical-blogging.png`
+
+For items without certificates (LeetCode, Blogging), use placeholder graphics.
 
 ---
 
-## 4. Skills Section (Hybrid Approach)
-**Desktop**: Interactive node network visualization
-- Animated connecting lines between skill nodes
-- Hover effects with skill details/progress
-- Clustered by category (Programming, Cloud, GenAI, etc.)
+## Implementation Summary
 
-**Mobile**: Clean categorized skill cards
-- Icon-based cards per category
-- Smooth hover animations
-- Easy to scan and read
+| Component | File | Changes |
+|-----------|------|---------|
+| Hero | `src/components/Hero.tsx` | Add typewriter hook with type/backspace logic, cycling phrases array, cursor animation |
+| Skills | `src/components/Skills.tsx` | Redesign node positions for brain-like layout, fixed connections, enhanced hover tooltips with skill levels |
+| Skills CSS | `src/index.css` | Add new styles for gradient rings, connection line animations, tooltip styling |
+| Certifications | `src/components/Certifications.tsx` | Add thumbnail images, certificate file paths, Dialog modal integration, perspective card styling |
 
 ---
 
-## 5. Projects Section
-Card-based grid with hover animations:
-- **Validate.AI** - Enterprise LLMOps Platform
-- **Agentic RAG** - Test Case Generation for 900+ APIs
-- **GenAI Chatbot** - Fine-tuned LLMs
-- **AIOps Agents** - Autonomous AI Operations
-- **Azure LLM Deployment** - Open-source models
-- **Full-stack GenAI App** - Dockerized Microservices
+## Files to Create
 
-Each card includes: description, tech stack tags, gradient thumbnail, hover lift effect
+1. **No new files needed** - all changes are modifications to existing components
+2. **User action required**: Upload certificate images to `/public/certifications/` folder with the naming convention above
 
 ---
 
-## 6. Certifications & Achievements
-Horizontal carousel with neon-bordered cards:
-- Google Generative AI Certification
-- GitHub Foundations Certification
-- Infosys Topaz AI Innovation Winner
-- IQE GenAI Hackathon Winner (AWS)
-- GFG Hack for Future Finalist
-- Employee of the Month
-- LeetCode achievements (200+ problems, top 60%)
-- Technical blogging (1000+ monthly views)
+## Technical Notes
 
----
+### Typewriter Implementation:
+- Uses `useState` for current text and phrase index
+- `useEffect` with `setInterval` for character-by-character animation
+- State machine: TYPING -> PAUSING -> DELETING -> PAUSING -> TYPING
 
-## 7. Ask My Bot Section
-Visual chatbot mockup featuring:
-- Friendly robot avatar illustration
-- Chat interface with input field
-- Pre-set sample prompts as clickable chips
-- Mock conversation bubbles demonstrating expertise
-- No backend required - purely visual showcase
+### Skills Visualization:
+- Fixed node positions calculated for aesthetic balance
+- SVG lines drawn with gradient strokes
+- CSS transitions for smooth hover effects
 
----
-
-## 8. Services Section
-Single highlighted service card:
-- End-to-end Generative AI development
-- Custom guardrails & evaluation pipelines
-- Enterprise-ready deployment with observability
-- Gradient border with subtle glow
-
----
-
-## 9. Contact Section
-Footer CTA styled like the reference:
-- "Let's start something great together" heading
-- Get in Touch button
-- Email: adityame0010@gmail.com
-- Location: Pune, India
-- Social icons: LinkedIn, GitHub, Medium
-
----
-
-## 10. Footer
-Minimal design with:
-- Copyright © Aditya Ravi Raj
-- Animated wave/data-flow graphic
-- Quick navigation links
-
----
-
-## Technical Approach
-- Fully responsive (mobile, tablet, desktop)
-- CSS animations for smooth transitions
-- Tailwind CSS for styling with custom color palette
-- React components for modularity
-- No backend required for initial build
-
+### Certificate Modal:
+- Uses existing `Dialog` component from shadcn/ui
+- State tracks which certificate is open (`selectedCert`)
+- Image displays in modal with max dimensions for readability
