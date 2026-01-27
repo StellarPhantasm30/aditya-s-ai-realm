@@ -1,8 +1,24 @@
 import { motion } from "framer-motion";
 import { Download, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTypewriter } from "@/hooks/use-typewriter";
+
+const phrases = [
+  "Aditya Ravi Raj",
+  "a Senior AI Engineer",
+  "a GenAI Specialist",
+  "an LLMOps Expert",
+];
 
 const Hero = () => {
+  const { currentText } = useTypewriter({
+    phrases,
+    typingSpeed: 80,
+    deletingSpeed: 40,
+    pauseDuration: 2000,
+    pauseAfterDeleteDuration: 500,
+  });
+
   const scrollToContact = () => {
     const element = document.querySelector("#contact");
     if (element) {
@@ -72,9 +88,10 @@ const Hero = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4"
+              className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 min-h-[1.2em]"
             >
-              <span className="gradient-text">{`Aditya Ravi Raj`}</span>
+              <span className="gradient-text">{currentText}</span>
+              <span className="terminal-cursor text-primary">|</span>
             </motion.h1>
 
             <motion.p
