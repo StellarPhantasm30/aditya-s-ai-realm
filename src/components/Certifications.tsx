@@ -1,6 +1,6 @@
 import { motion, useInView } from "framer-motion";
 import { useRef, useState } from "react";
-import { Award, Trophy, Medal, BookOpen, TrendingUp, Newspaper } from "lucide-react";
+import { Award, Trophy, Medal, BookOpen, TrendingUp, Newspaper, Code, Database } from "lucide-react";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
@@ -27,7 +27,7 @@ const certifications = [
     icon: Medal,
     description: "Top finalist in GeeksforGeeks nationwide hackathon",
     color: "from-green-500 to-emerald-500",
-    certificateImage: "/certifications/gfg-hack-for-future.png",
+    certificateImage: "/certifications/gfg-hack-for-future.jpg",
   },
   {
     title: "Google Generative AI",
@@ -54,12 +54,44 @@ const certifications = [
     certificateImage: "/certifications/employee-of-month.png",
   },
   {
+    title: "Insta Award",
+    type: "Award",
+    icon: Award,
+    description: "Recognized for exceptional performance and contributions",
+    color: "from-purple-500 to-pink-500",
+    certificateImage: "/certifications/infosys-insta-award-1.png",
+  },
+  {
     title: "LeetCode Achievements",
     type: "200+ Problems",
     icon: TrendingUp,
     description: "Solved 200+ problems, global rank under 60%",
     color: "from-amber-500 to-yellow-500",
-    certificateImage: "/certifications/leetcode-achievements.png",
+    certificateImage: "/certifications/leetcode-200.png",
+  },
+  {
+  title: "Infosys Insta Awards",
+  type: "Certificate of Appreciation",
+  icon: Award,
+  description: "Recognized for contribution and impact within the Infosys Quality Engineering unit.",
+  color: "from-blue-700 to-indigo-800",
+  certificateImage: "/certifications/infosys-insta-award-2.png",
+  },
+  {
+    title: "HackerRank Java Certification",
+    type: "Certification",
+    icon: Code,
+    description: "Successfully cleared HackerRank Java (Basic) skill assessment.",
+    color: "from-green-500 to-emerald-600",
+    certificateImage: "/certifications/hackerrank-java-basic.png",
+  },
+  {
+    title: "MongoDB SI Associate",
+    type: "Certification",
+    icon: Database,
+    description: "Completed MongoDB SI Associate Certification, validating MongoDB fundamentals and ecosystem knowledge.",
+    color: "from-emerald-600 to-lime-500",
+    certificateImage: "/certifications/mongodb-si-associate.png",
   },
   {
     title: "Technical Blogging",
@@ -194,24 +226,51 @@ const Certifications = () => {
         </motion.div>
       </div>
 
-      {/* Certificate Modal */}
+      {/* Certificate Modal - supports image and PDF */}
       <Dialog open={!!selectedCert} onOpenChange={() => setSelectedCert(null)}>
         <DialogContent className="max-w-4xl w-full bg-card/95 backdrop-blur-xl border-border p-2">
           {selectedCert && (
             <div className="relative">
-              <img
-                src={selectedCert.certificateImage}
-                alt={`${selectedCert.title} certificate`}
-                className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = '/placeholder.svg';
-                }}
-              />
-              <div className="absolute bottom-4 left-4 right-4 glass rounded-lg p-4">
-                <h3 className="text-lg font-bold gradient-text">{selectedCert.title}</h3>
-                <p className="text-sm text-muted-foreground">{selectedCert.description}</p>
-              </div>
+              {selectedCert.certificateImage.match(/\.pdf$/i) ? (
+                <>
+                  <iframe
+                    src={selectedCert.certificateImage}
+                    title={`${selectedCert.title} certificate`}
+                    className="w-full h-[80vh] rounded-lg bg-white"
+                  />
+                  <div className="absolute bottom-4 left-4 right-4 glass rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                    <div>
+                      <h3 className="text-lg font-bold gradient-text">{selectedCert.title}</h3>
+                      <p className="text-sm text-muted-foreground">{selectedCert.description}</p>
+                    </div>
+                    <a
+                      href={selectedCert.certificateImage}
+                      download
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block mt-2 md:mt-0 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium shadow hover:opacity-90"
+                    >
+                      Download PDF
+                    </a>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <img
+                    src={selectedCert.certificateImage}
+                    alt={`${selectedCert.title} certificate`}
+                    className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = '/placeholder.svg';
+                    }}
+                  />
+                  <div className="absolute bottom-4 left-4 right-4 glass rounded-lg p-4">
+                    <h3 className="text-lg font-bold gradient-text">{selectedCert.title}</h3>
+                    <p className="text-sm text-muted-foreground">{selectedCert.description}</p>
+                  </div>
+                </>
+              )}
             </div>
           )}
         </DialogContent>
