@@ -1,147 +1,193 @@
 
-# Enhancement Plan: Typewriter Effect, Skills Visualization & Certifications
+# Technical Skills Section Redesign
 
-This plan addresses three key improvements to make your portfolio more visually striking and interactive.
-
----
-
-## 1. Hero Typewriter Effect
-
-Add a dynamic typewriter effect that cycles through roles/titles with a realistic type-and-backspace animation.
-
-### How it will work:
-- Text types character by character with natural timing
-- Pauses at the end of each phrase (2 seconds)
-- Backspaces to erase the text character by character
-- Types the next phrase in the rotation
-- Cycles infinitely through all phrases
-
-### Phrases to cycle:
-1. "Aditya Ravi Raj"
-2. "a Senior AI Engineer"
-3. "a GenAI Specialist"
-4. "an LLMOps Expert"
-
-### Visual appearance:
-- Blinking cursor at the end of text
-- Gradient text styling maintained
-- Smooth transitions between typing states
+Complete overhaul of the Skills visualization to create a static, always-visible graph-based skill map with a futuristic neural network aesthetic.
 
 ---
 
-## 2. Skills Section - Desktop Visualization Redesign
+## Current State
 
-Transform the current basic node layout into an aesthetic neural network visualization matching your reference images.
+The current implementation uses:
+- Hover-based popups to reveal tools/technologies
+- Abstract node positions without clear hierarchy
+- Generic Lucide icons for categories
+- Dynamic hover states that hide information
 
-### New Layout Design:
+---
+
+## New Design: Static Hierarchical Skill Graph
+
+### Visual Concept
+
+Each skill category becomes a **hub node** (large, prominent) with **tool nodes** (smaller, with actual logos) branching out visibly at all times.
+
 ```text
-                    [Programming & Databases]
-                            |
-       [Cloud & DevOps]-----+-----[Backend & APIs]
-              \             |            /
-               \    [Generative AI & ML] /
-                \         |           /
-       [Architecture]----+----[LLMOps / MLOps]
+Layout per Hub (example: Cloud & DevOps):
+
+                    [Docker Compose]
+                         /
+            [Docker]----/
+                 \
+                  \____[Cloud & DevOps]____[AWS]
+                       (HUB - large)    \
+                      /    |             \
+              [Azure]     [K8s]        [GCP]
+                           |
+                      [Terraform]
 ```
 
-### Visual Improvements:
-1. **Larger, more prominent nodes** (80x80px) with gradient ring borders
-2. **Color-coded ring around each node** matching category colors
-3. **Icons displayed inside nodes** with white background
-4. **Fixed connection lines** (not random) - logical connections between related skills
-5. **Smooth animated lines** with gradient/glow effect
-6. **Hover tooltip** showing skill name with level/proficiency bar
-
-### Hover Behavior:
-- Node glows with category color
-- Popup panel appears with:
-  - Category name in gradient text
-  - List of technologies as styled chips
-  - Subtle glass effect background
-
-### Connection Logic (fixed, not random):
-- Programming connects to Backend, GenAI, Cloud
-- Backend connects to Cloud, LLMOps
-- Cloud connects to LLMOps, Architecture
-- GenAI connects to LLMOps, Architecture
-- Architecture connects to all (central practices)
-
 ---
 
-## 3. Certifications Section - Thumbnail Gallery with Modal
+## Technical Implementation
 
-Redesign the certifications section to display certificate thumbnails in a stacked/perspective layout with click-to-view functionality.
+### 1. Data Structure
 
-### Visual Layout (matching reference):
-- Certificates displayed at slight angles creating depth
-- Connected by a flowing curved line with dots at connection points
-- Center certificate is larger/focused
-- Side certificates are smaller with perspective tilt
+```typescript
+interface ToolNode {
+  name: string;
+  icon: IconType; // from react-icons
+  color: string;  // brand color for glow
+  position: { x: number; y: number }; // absolute position
+}
 
-### Card Structure:
-```text
-+---------------------------+
-|  [Thumbnail Image]        |
-|  Certificate preview      |
-+---------------------------+
-|  Badge: "Winner"          |
-|  Title: "Infosys Topaz"   |
-|  Description text         |
-+---------------------------+
+interface HubNode {
+  name: string;
+  icon: IconType;
+  color: string;
+  position: { x: number; y: number };
+  tools: ToolNode[];
+}
 ```
 
-### Click Behavior:
-- Clicking anywhere on the card opens a modal dialog
-- Modal displays the full certificate image at large size
-- Modal has a close button and dark overlay
-- Smooth animation on open/close
+### 2. Hub Categories with Tools
 
-### Certificate File Structure:
-Certificates stored at `/public/certifications/`:
-- `infosys-topaz-ai.png`
-- `iqe-genai-hackathon.png`
-- `gfg-hack-for-future.png`
-- `google-generative-ai.png`
-- `github-foundations.png`
-- `employee-of-month.png`
-- `leetcode-achievements.png`
-- `technical-blogging.png`
+| Hub | Tools |
+|-----|-------|
+| Programming & Databases | Java, Python, MySQL, FAISS, Chroma, Pinecone |
+| Backend & APIs | FastAPI, Flask, REST, MCP, Streamlit, Docker |
+| Cloud & DevOps | AWS, Azure, Kafka, Redis, Git, Serverless, LiteLLM |
+| Generative AI & ML | LangChain, LangGraph, CrewAI, TensorFlow, PEFT, QLoRA, Bedrock, OpenAI |
+| LLMOps / MLOps | MLflow, DVC, Weights & Biases, Langfuse, LangSmith |
+| Architecture & Practices | Microservices, System Design, Agile/SCRUM, DSA |
 
-For items without certificates (LeetCode, Blogging), use placeholder graphics.
+### 3. Visual Design Specifications
+
+**Hub Nodes (Primary):**
+- Size: 80-90px diameter
+- Glassmorphism background with backdrop blur
+- Colored gradient border ring
+- Category icon inside (Lucide icons)
+- Category label below
+- Subtle pulse glow animation (optional)
+
+**Tool Nodes (Secondary):**
+- Size: 50-60px diameter
+- Glassmorphism background
+- Brand-appropriate color border/glow
+- Tool logo/icon inside (react-icons)
+- Tool name label below
+- Always visible, no hover required
+
+**Connection Lines:**
+- SVG-based lines connecting hub to each tool
+- Thin glowing lines (1-2px stroke)
+- Gradient from blue to purple
+- Lines originate from hub center to tool center
+
+### 4. Layout Strategy
+
+The component will be divided into 6 distinct hub clusters, each independently positioned. Layout uses absolute positioning within a large container:
+
+```text
+Container (1400px x 1200px relative)
+
+[Hub 1: Programming]     [Hub 2: Backend]      [Hub 3: Cloud]
+   with tools              with tools            with tools
+   branching               branching             branching
+
+        [Hub 4: GenAI - CENTRAL, LARGEST]
+              with tools branching
+
+[Hub 5: LLMOps]                            [Hub 6: Architecture]
+   with tools                                 with tools
+```
+
+Each hub is a self-contained cluster with manually positioned tool nodes around it.
+
+### 5. Component Architecture
+
+```text
+<Skills>
+  ├── Section Header ("Technical Skills")
+  │
+  ├── Desktop View (lg:block)
+  │   └── <SkillGraph>
+  │       ├── <svg> (all connection lines)
+  │       │   └── <defs> (gradients, filters)
+  │       │   └── <line> elements for each hub-to-tool connection
+  │       │
+  │       └── <HubCluster> x 6
+  │           ├── <HubNode> (large, centered)
+  │           └── <ToolNode> x N (positioned around hub)
+  │
+  └── Mobile View (lg:hidden)
+      └── Card grid (existing implementation - kept as is)
+```
+
+### 6. Styling Details
+
+**Background:**
+- Dark navy base (`bg-background`)
+- Soft radial gradient overlays at hub positions
+- Subtle grid pattern or dots (optional)
+
+**Glassmorphism Nodes:**
+```css
+.skill-node {
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 20px rgba(color, 0.3);
+}
+```
+
+**Connection Lines:**
+```css
+.connection-line {
+  stroke: url(#skillLineGradient);
+  stroke-width: 1.5;
+  filter: url(#skillGlow);
+}
+```
+
+### 7. Icons from react-icons
+
+Using appropriate icon packs:
+- `SiJava`, `SiPython`, `SiMysql` from `react-icons/si` (Simple Icons)
+- `FaAws`, `FaDocker` from `react-icons/fa` (Font Awesome)
+- `SiTensorflow`, `SiOpenai` from `react-icons/si`
+- Fallback to first letter for tools without icons
 
 ---
 
-## Implementation Summary
+## Files to Modify
 
-| Component | File | Changes |
-|-----------|------|---------|
-| Hero | `src/components/Hero.tsx` | Add typewriter hook with type/backspace logic, cycling phrases array, cursor animation |
-| Skills | `src/components/Skills.tsx` | Redesign node positions for brain-like layout, fixed connections, enhanced hover tooltips with skill levels |
-| Skills CSS | `src/index.css` | Add new styles for gradient rings, connection line animations, tooltip styling |
-| Certifications | `src/components/Certifications.tsx` | Add thumbnail images, certificate file paths, Dialog modal integration, perspective card styling |
+| File | Changes |
+|------|---------|
+| `src/components/Skills.tsx` | Complete rewrite with new graph-based layout, hub clusters, always-visible tool nodes, SVG connections |
+| `src/index.css` | Add glassmorphism utility classes for skill nodes |
 
 ---
 
-## Files to Create
+## Mobile Behavior
 
-1. **No new files needed** - all changes are modifications to existing components
-2. **User action required**: Upload certificate images to `/public/certifications/` folder with the naming convention above
+Mobile layout remains unchanged - the card-based grid view is already good for smaller screens. The graph visualization is hidden on mobile and replaced with the categorized cards.
 
 ---
 
-## Technical Notes
+## No Longer Included
 
-### Typewriter Implementation:
-- Uses `useState` for current text and phrase index
-- `useEffect` with `setInterval` for character-by-character animation
-- State machine: TYPING -> PAUSING -> DELETING -> PAUSING -> TYPING
-
-### Skills Visualization:
-- Fixed node positions calculated for aesthetic balance
-- SVG lines drawn with gradient strokes
-- CSS transitions for smooth hover effects
-
-### Certificate Modal:
-- Uses existing `Dialog` component from shadcn/ui
-- State tracks which certificate is open (`selectedCert`)
-- Image displays in modal with max dimensions for readability
+- Hover popups (removed)
+- Skill level bars (removed)
+- Dynamic hover states (removed)
+- Abstract node-only layout (replaced with hub + tools)
