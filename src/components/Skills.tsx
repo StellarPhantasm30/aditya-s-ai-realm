@@ -3,14 +3,14 @@ import { useRef } from "react";
 import { SiJavascript, SiTypescript, SiDatabricks, SiLeetcode, SiAwslambda, SiPython, SiPostgresql, SiFastapi, SiFlask, SiDocker, SiStreamlit, SiApachekafka, SiRedis, SiGit, SiTensorflow, SiLangchain, SiOpenai, SiMlflow, SiWeightsandbiases, SiDvc, SiScikitlearn, SiCloudflare, SiGraphql, SiGooglecolab, SiPytorch, SiGooglecloud, SiBookstack, SiMonero, SiScrutinizerci } from "react-icons/si";
 import { FaJava, FaAws } from "react-icons/fa";
 import { VscAzure } from "react-icons/vsc";
-import {
-  LangGraph,
-  CrewAI,
-  Bedrock,
-  MCP,
-  AzureAI,
-  LangSmith
-} from "@lobehub/icons";
+// import {
+//   LangGraph,
+//   CrewAI,
+//   Bedrock,
+//   MCP,
+//   AzureAI,
+//   LangSmith
+// } from "@lobehub/icons";
 
 // Skill node interface for grid
 interface SkillNode {
@@ -51,26 +51,26 @@ const skillNodes: SkillNode[] = [
   { name: "Chroma", icon: SiDatabricks, color: "#ff6b6b", x: position_databases.x, y: position_databases.y+3, connections: [[position_databases.x,position_databases.y+4]] },
   { name: "Pinecone", icon: SiDatabricks, color: "#00d4aa", x: position_databases.x, y: position_databases.y+4, connections: [[position_databases.x,position_databases.y+5]] },
   { name: "Qdrant", icon: SiDatabricks, color: "#00d4aa", x: position_databases.x, y: position_databases.y+5, connections: [[position_databases.x,position_databases.y+6]] },
-  { name: "Azure AI Search", icon: AzureAI, color: "#00d4aa", x: position_databases.x, y: position_databases.y+6, connections: [] },
+  { name: "Azure AI Search", icon: VscAzure, color: "#00d4aa", x: position_databases.x, y: position_databases.y+6, connections: [] },
 
   // Generative AI & ML
   { name: "Generative AI & ML", icon: SiBookstack, color: "#6366f1", x: position_genai.x, y: position_genai.y, connections: [[position_genai.x,position_genai.y+1]] },
   { name: "TensorFlow", icon: SiTensorflow, color: "#ff6f00", x: position_genai.x, y: position_genai.y+1, connections: [[position_genai.x,position_genai.y+2]] },
   { name: "LangChain", icon: SiLangchain, color: "#2dd4bf", x: position_genai.x, y: position_genai.y+2, connections: [[position_genai.x,position_genai.y+3]] },
-  { name: "LangGraph", icon: { Color: LangGraph.Avatar }, color: "#2dd4bf", x: position_genai.x, y: position_genai.y+3, connections: [[position_genai.x,position_genai.y+4]] },
-  { name: "CrewAI", icon: CrewAI, color: "#ff6b6b", x: position_genai.x, y: position_genai.y+4, connections: [[position_genai.x,position_genai.y+5]] },
+  { name: "LangGraph", icon: SiLangchain, color: "#2dd4bf", x: position_genai.x, y: position_genai.y+3, connections: [[position_genai.x,position_genai.y+4]] },
+  { name: "CrewAI", color: "#ff6b6b", x: position_genai.x, y: position_genai.y+4, connections: [[position_genai.x,position_genai.y+5]] },
   // { name: "PEFT", icon: SiPytorch, color: "#fbbf24", x: position_genai.x, y: position_genai.y+5, connections: [[position_genai.x,position_genai.y+6]] },
   // { name: "QLoRA", icon: null, color: "#8b5cf6", x: position_genai.x, y: position_genai.y+6, connections: [[position_genai.x,position_genai.y+7]] },
-  { name: "Bedrock", icon: Bedrock, color: "#ff9900", x: position_genai.x, y: position_genai.y+5, connections: [[position_genai.x,position_genai.y+6]] },
+  { name: "Bedrock", icon: FaAws, color: "#ff9900", x: position_genai.x, y: position_genai.y+5, connections: [[position_genai.x,position_genai.y+6]] },
   { name: "scikit-learn", icon: SiScikitlearn, color: "#f7931e", x: position_genai.x, y: position_genai.y+6, connections: [[position_genai.x,position_genai.y+7]] },
-  { name: "MCP", icon: MCP, color: "#ff7675", x: position_genai.x, y: position_genai.y+7, connections: [[position_genai.x,position_genai.y+8]] },
+  { name: "MCP", color: "#ff7675", x: position_genai.x, y: position_genai.y+7, connections: [[position_genai.x,position_genai.y+8]] },
   { name: "A2A", icon: null, color: "#ff7675", x: position_genai.x, y: position_genai.y+8, connections: [] },
 
   // LLMOps/MLOps
   { name: "LLMOps/MLOps", icon: SiWeightsandbiases, color: "#ef4444", x: position_llmops.x, y: position_llmops.y, connections: [[position_llmops.x,position_llmops.y+1]] },
   { name: "DVC", icon: SiDvc, color: "#13adc7", x: position_llmops.x, y: position_llmops.y+1, connections: [[position_llmops.x,position_llmops.y+2]] },
   { name: "Langfuse", icon: SiGraphql, color: "#2dd4bf", x: position_llmops.x, y: position_llmops.y+2, connections: [[position_llmops.x,position_llmops.y+3]] },
-  { name: "LangSmith", icon: { Color: LangSmith.Avatar }, color: "#2dd4bf", x: position_llmops.x, y: position_llmops.y+3, connections: [[position_llmops.x,position_llmops.y+4]] },
+  { name: "LangSmith", icon: SiLangchain, color: "#2dd4bf", x: position_llmops.x, y: position_llmops.y+3, connections: [[position_llmops.x,position_llmops.y+4]] },
   { name: "LiteLLM", icon: SiCloudflare, color: "#a855f7", x: position_llmops.x, y: position_llmops.y+4, connections: [[position_llmops.x,position_llmops.y+5]] },
   { name: "MLflow", icon: SiMlflow, color: "#0194e2", x: position_llmops.x, y: position_llmops.y+5, connections: [[position_llmops.x,position_llmops.y+6]] },
   { name: "W&B", icon: SiWeightsandbiases, color: "#ffbe00", x: position_llmops.x, y: position_llmops.y+6, connections: [] },
