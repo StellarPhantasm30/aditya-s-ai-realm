@@ -48,7 +48,7 @@ const Projects = () => {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section id="projects" className="py-20 relative">
+    <section id="projects" className="py-0 relative">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-accent/5 to-transparent" />
 
       <div className="container mx-auto px-4 md:px-8 relative">

@@ -1,355 +1,188 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { 
-  Code, Cloud, Brain, Server, Settings, Layers
-} from "lucide-react";
-import { 
-  SiPython, SiMysql, SiFastapi, SiFlask, SiDocker,
-  SiStreamlit, SiApachekafka, SiRedis, SiGit, SiTensorflow,
-  SiLangchain, SiOpenai, SiMlflow, SiWeightsandbiases
-} from "react-icons/si";
+import { SiJavascript, SiTypescript, SiDatabricks, SiLeetcode, SiAwslambda, SiPython, SiPostgresql, SiFastapi, SiFlask, SiDocker, SiStreamlit, SiApachekafka, SiRedis, SiGit, SiTensorflow, SiLangchain, SiOpenai, SiMlflow, SiWeightsandbiases, SiDvc, SiScikitlearn, SiCloudflare, SiGraphql, SiGooglecolab, SiPytorch, SiGooglecloud, SiBookstack, SiMonero, SiScrutinizerci } from "react-icons/si";
 import { FaJava, FaAws } from "react-icons/fa";
 import { VscAzure } from "react-icons/vsc";
-import { IconType } from "react-icons";
-import { LucideIcon } from "lucide-react";
+import {
+  LangGraph,
+  CrewAI,
+  Bedrock,
+  MCP,
+  AzureAI,
+  LangSmith
+} from "@lobehub/icons";
 
-// Tool node interface
-interface ToolNode {
+// Skill node interface for grid
+interface SkillNode {
   name: string;
-  icon?: IconType;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  icon?: any;
   color: string;
-  // Manual position offset from hub center (in pixels)
-  offsetX: number;
-  offsetY: number;
+  x: number; // grid x
+  y: number; // grid y
+  connections: [number, number][]; // array of [x, y] grid coordinates to connect to
 }
+const x = -7;
+const gap = 1.5;
+const y = 0;
 
-// Hub data with tools
-interface HubData {
-  name: string;
-  shortName: string;
-  icon: LucideIcon;
-  color: string;
-  colorHex: string;
-  tools: ToolNode[];
-}
+const position_programming = { x: x, y: y };
+const position_databases = { x: x+gap, y: y };
+const position_genai = { x: -4, y: y };
+const position_llmops = { x: -2.5, y: y };
+const position_backend = { x: -1, y: y };
+const position_cloud = { x: 0.5, y: y };
+const position_architecture = { x: 2, y: y };
 
-const hubsData: HubData[] = [
-  {
-    name: "Programming & Databases",
-    shortName: "Programming",
-    icon: Code,
-    color: "from-blue-500 to-cyan-500",
-    colorHex: "#3b82f6",
-    tools: [
-      { name: "Java", icon: FaJava, color: "#f89820", offsetX: 40, offsetY: -100 },
-      { name: "Python", icon: SiPython, color: "#3776ab", offsetX: 100, offsetY: -50 },
-      { name: "MySQL", icon: SiMysql, color: "#4479a1", offsetX: 100, offsetY: 50 },
-      { name: "FAISS", color: "#00bcff", offsetX: 40, offsetY: 100 },
-      { name: "Chroma", color: "#ff6b6b", offsetX: -80, offsetY: 60 },
-      { name: "Pinecone", color: "#00d4aa", offsetX: -80, offsetY: -60 },
-    ],
-  },
-  {
-    name: "Backend & APIs",
-    shortName: "Backend",
-    icon: Server,
-    color: "from-green-500 to-emerald-500",
-    colorHex: "#22c55e",
-    tools: [
-      { name: "FastAPI", icon: SiFastapi, color: "#009688", offsetX: 0, offsetY: -100 },
-      { name: "Flask", icon: SiFlask, color: "#ffffff", offsetX: 90, offsetY: -50 },
-      { name: "REST", color: "#6c5ce7", offsetX: 90, offsetY: 50 },
-      { name: "MCP", color: "#ff7675", offsetX: 0, offsetY: 100 },
-      { name: "Streamlit", icon: SiStreamlit, color: "#ff4b4b", offsetX: -90, offsetY: 50 },
-      { name: "Docker", icon: SiDocker, color: "#2496ed", offsetX: -90, offsetY: -50 },
-    ],
-  },
-  {
-    name: "Cloud & DevOps",
-    shortName: "Cloud",
-    icon: Cloud,
-    color: "from-orange-500 to-amber-500",
-    colorHex: "#f97316",
-    tools: [
-      { name: "AWS", icon: FaAws, color: "#ff9900", offsetX: 40, offsetY: -100 },
-      { name: "Azure", icon: VscAzure, color: "#0089d6", offsetX: 100, offsetY: -30 },
-      { name: "Kafka", icon: SiApachekafka, color: "#231f20", offsetX: 100, offsetY: 50 },
-      { name: "Redis", icon: SiRedis, color: "#dc382d", offsetX: 40, offsetY: 100 },
-      { name: "Git", icon: SiGit, color: "#f05032", offsetX: -60, offsetY: 80 },
-      { name: "Serverless", color: "#fd5750", offsetX: -90, offsetY: 0 },
-      { name: "LiteLLM", color: "#a855f7", offsetX: -60, offsetY: -80 },
-    ],
-  },
-  {
-    name: "Generative AI & ML",
-    shortName: "GenAI",
-    icon: Brain,
-    color: "from-purple-500 to-pink-500",
-    colorHex: "#a855f7",
-    tools: [
-      { name: "LangChain", icon: SiLangchain, color: "#1c3c3c", offsetX: 0, offsetY: -110 },
-      { name: "LangGraph", color: "#2dd4bf", offsetX: 90, offsetY: -70 },
-      { name: "CrewAI", color: "#ff6b6b", offsetX: 110, offsetY: 0 },
-      { name: "TensorFlow", icon: SiTensorflow, color: "#ff6f00", offsetX: 90, offsetY: 70 },
-      { name: "PEFT", color: "#fbbf24", offsetX: 0, offsetY: 110 },
-      { name: "QLoRA", color: "#8b5cf6", offsetX: -90, offsetY: 70 },
-      { name: "Bedrock", color: "#ff9900", offsetX: -110, offsetY: 0 },
-      { name: "OpenAI", icon: SiOpenai, color: "#412991", offsetX: -90, offsetY: -70 },
-    ],
-  },
-  {
-    name: "LLMOps / MLOps",
-    shortName: "LLMOps",
-    icon: Settings,
-    color: "from-red-500 to-rose-500",
-    colorHex: "#ef4444",
-    tools: [
-      { name: "MLflow", icon: SiMlflow, color: "#0194e2", offsetX: 0, offsetY: -100 },
-      { name: "DVC", color: "#13adc7", offsetX: 90, offsetY: -30 },
-      { name: "W&B", icon: SiWeightsandbiases, color: "#ffbe00", offsetX: 70, offsetY: 70 },
-      { name: "Langfuse", color: "#3b82f6", offsetX: -70, offsetY: 70 },
-      { name: "LangSmith", color: "#10b981", offsetX: -90, offsetY: -30 },
-    ],
-  },
-  {
-    name: "Architecture & Practices",
-    shortName: "Architecture",
-    icon: Layers,
-    color: "from-indigo-500 to-violet-500",
-    colorHex: "#6366f1",
-    tools: [
-      { name: "Microservices", color: "#06b6d4", offsetX: 60, offsetY: -90 },
-      { name: "System Design", color: "#8b5cf6", offsetX: 90, offsetY: 30 },
-      { name: "Agile/SCRUM", color: "#22c55e", offsetX: -30, offsetY: 90 },
-      { name: "DSA", color: "#f59e0b", offsetX: -90, offsetY: -30 },
-    ],
-  },
+
+// Define the grid and skills (example layout, can be tweaked for aesthetics)
+const skillNodes: SkillNode[] = [
+  // Programming Languages
+  { name: "Programming", icon: SiDatabricks, color: "#3b82f6", x: position_programming.x, y: position_programming.y, connections: [[position_programming.x,position_programming.y+1]] },
+  { name: "Java", icon: FaJava, color: "#f89820", x: position_programming.x, y: position_programming.y+1, connections: [[position_programming.x,position_programming.y+2]] },
+  { name: "Python", icon: SiPython, color: "#3776ab", x: position_programming.x, y: position_programming.y+2, connections: [[position_programming.x,position_programming.y+3]] },
+  { name: "JavaScript", icon: SiJavascript, color: "#3776ab", x: position_programming.x, y: position_programming.y+3, connections: [[position_programming.x,position_programming.y+4]] },
+  { name: "TypeScript", icon: SiTypescript, color: "#3776ab", x: position_programming.x, y: position_programming.y+4, connections: [] },
+
+  // Databases
+  { name: "Databases", icon: SiDatabricks, color: "#3b82f6", x: position_databases.x, y: position_databases.y, connections: [[position_databases.x,position_databases.y+1]] },
+  { name: "PostgreSQL", icon: SiPostgresql, color: "#4479a1", x: position_databases.x, y: position_databases.y+1, connections: [[position_databases.x,position_databases.y+2]] },
+  { name: "FAISS", icon: SiDatabricks, color: "#00bcff", x: position_databases.x, y: position_databases.y+2, connections: [[position_databases.x,position_databases.y+3]] },
+  { name: "Chroma", icon: SiDatabricks, color: "#ff6b6b", x: position_databases.x, y: position_databases.y+3, connections: [[position_databases.x,position_databases.y+4]] },
+  { name: "Pinecone", icon: SiDatabricks, color: "#00d4aa", x: position_databases.x, y: position_databases.y+4, connections: [[position_databases.x,position_databases.y+5]] },
+  { name: "Qdrant", icon: SiDatabricks, color: "#00d4aa", x: position_databases.x, y: position_databases.y+5, connections: [[position_databases.x,position_databases.y+6]] },
+  { name: "Azure AI Search", icon: AzureAI, color: "#00d4aa", x: position_databases.x, y: position_databases.y+6, connections: [] },
+
+  // Generative AI & ML
+  { name: "Generative AI & ML", icon: SiBookstack, color: "#6366f1", x: position_genai.x, y: position_genai.y, connections: [[position_genai.x,position_genai.y+1]] },
+  { name: "TensorFlow", icon: SiTensorflow, color: "#ff6f00", x: position_genai.x, y: position_genai.y+1, connections: [[position_genai.x,position_genai.y+2]] },
+  { name: "LangChain", icon: SiLangchain, color: "#2dd4bf", x: position_genai.x, y: position_genai.y+2, connections: [[position_genai.x,position_genai.y+3]] },
+  { name: "LangGraph", icon: { Color: LangGraph.Avatar }, color: "#2dd4bf", x: position_genai.x, y: position_genai.y+3, connections: [[position_genai.x,position_genai.y+4]] },
+  { name: "CrewAI", icon: CrewAI, color: "#ff6b6b", x: position_genai.x, y: position_genai.y+4, connections: [[position_genai.x,position_genai.y+5]] },
+  // { name: "PEFT", icon: SiPytorch, color: "#fbbf24", x: position_genai.x, y: position_genai.y+5, connections: [[position_genai.x,position_genai.y+6]] },
+  // { name: "QLoRA", icon: null, color: "#8b5cf6", x: position_genai.x, y: position_genai.y+6, connections: [[position_genai.x,position_genai.y+7]] },
+  { name: "Bedrock", icon: Bedrock, color: "#ff9900", x: position_genai.x, y: position_genai.y+5, connections: [[position_genai.x,position_genai.y+6]] },
+  { name: "scikit-learn", icon: SiScikitlearn, color: "#f7931e", x: position_genai.x, y: position_genai.y+6, connections: [[position_genai.x,position_genai.y+7]] },
+  { name: "MCP", icon: MCP, color: "#ff7675", x: position_genai.x, y: position_genai.y+7, connections: [[position_genai.x,position_genai.y+8]] },
+  { name: "A2A", icon: null, color: "#ff7675", x: position_genai.x, y: position_genai.y+8, connections: [] },
+
+  // LLMOps/MLOps
+  { name: "LLMOps/MLOps", icon: SiWeightsandbiases, color: "#ef4444", x: position_llmops.x, y: position_llmops.y, connections: [[position_llmops.x,position_llmops.y+1]] },
+  { name: "DVC", icon: SiDvc, color: "#13adc7", x: position_llmops.x, y: position_llmops.y+1, connections: [[position_llmops.x,position_llmops.y+2]] },
+  { name: "Langfuse", icon: SiGraphql, color: "#2dd4bf", x: position_llmops.x, y: position_llmops.y+2, connections: [[position_llmops.x,position_llmops.y+3]] },
+  { name: "LangSmith", icon: { Color: LangSmith.Avatar }, color: "#2dd4bf", x: position_llmops.x, y: position_llmops.y+3, connections: [[position_llmops.x,position_llmops.y+4]] },
+  { name: "LiteLLM", icon: SiCloudflare, color: "#a855f7", x: position_llmops.x, y: position_llmops.y+4, connections: [[position_llmops.x,position_llmops.y+5]] },
+  { name: "MLflow", icon: SiMlflow, color: "#0194e2", x: position_llmops.x, y: position_llmops.y+5, connections: [[position_llmops.x,position_llmops.y+6]] },
+  { name: "W&B", icon: SiWeightsandbiases, color: "#ffbe00", x: position_llmops.x, y: position_llmops.y+6, connections: [] },
+
+  // Backend & APIs
+  { name: "Backend & APIs", icon: SiFastapi, color: "#22c55e", x: position_backend.x, y: position_backend.y, connections: [[position_backend.x,position_backend.y+1]] },
+  { name: "FastAPI", icon: SiFastapi, color: "#009688", x: position_backend.x, y: position_backend.y+1, connections: [[position_backend.x, position_backend.y+2]] },
+  { name: "Flask", icon: SiFlask, color: "#ffffff", x: position_backend.x, y: position_backend.y+2, connections: [[position_backend.x, position_backend.y+3]] },
+  { name: "Docker", icon: SiDocker, color: "#2496ed", x: position_backend.x, y: position_backend.y+3, connections: [[position_backend.x, position_backend.y+4]] },
+  { name: "Streamlit", icon: SiStreamlit, color: "#ff4b4b", x: position_backend.x, y: position_backend.y+4, connections: [[position_backend.x, position_backend.y+5]] },
+  { name: "Kafka", icon: SiApachekafka, color: "#dc382d", x: position_backend.x, y: position_backend.y+5, connections: [[position_backend.x, position_backend.y+6]] },
+  { name: "Redis", icon: SiRedis, color: "#dc382d", x: position_backend.x, y: position_backend.y+6, connections: [[position_backend.x, position_backend.y+7]] },
+
+  // Cloud & DevOps
+  { name: "Cloud & DevOps", icon: SiGooglecloud, color: "#f97316", x: position_cloud.x, y: position_cloud.y, connections: [[position_cloud.x,position_cloud.y+1]] },
+  { name: "AWS", icon: FaAws, color: "#ff9900", x: position_cloud.x, y: position_cloud.y+1, connections: [[position_cloud.x,position_cloud.y+2]] },
+  { name: "Azure", icon: VscAzure, color: "#0089d6", x: position_cloud.x, y: position_cloud.y+2, connections: [[position_cloud.x,position_cloud.y+3]] },
+  { name: "OpenAI", icon: SiOpenai, color: "#ffffff", x: position_cloud.x, y: position_cloud.y+3, connections: [[position_cloud.x,position_cloud.y+4]] },
+  { name: "Serverless", icon: SiAwslambda, color: "#fd5750", x: position_cloud.x, y: position_cloud.y+4, connections: [[position_cloud.x,position_cloud.y+5]] },
+  { name: "Git", icon: SiGit, color: "#f05032", x: position_cloud.x, y: position_cloud.y+5, connections: [] },
+
+  // Architecture & Practices
+  { name: "Architecture & Practices", icon: SiBookstack, color: "#6366f1", x: position_architecture.x, y: position_architecture.y, connections: [[position_architecture.x,position_architecture.y+1]] },
+  { name: "Microservices", icon: SiGraphql, color: "#06b6d4", x: position_architecture.x, y: position_architecture.y+1, connections: [[position_architecture.x,position_architecture.y+2]] },
+  { name: "Monolithic", icon: SiMonero, color: "#6366f1", x: position_architecture.x, y: position_architecture.y+2, connections: [[position_architecture.x,position_architecture.y+3]] },
+  { name: "REST", icon: null, color: "#6c5ce7", x: position_architecture.x, y: position_architecture.y+3, connections: [[position_architecture.x,position_architecture.y+4]] },
+  { name: "System Design", icon: SiBookstack, color: "#8b5cf6", x: position_architecture.x, y: position_architecture.y+4, connections: [[position_architecture.x,position_architecture.y+5]] },
+  { name: "Agile/SCRUM", icon: SiScrutinizerci, color: "#22c55e", x: position_architecture.x, y: position_architecture.y+5, connections: [[position_architecture.x,position_architecture.y+6]] },
+  { name: "DSA", icon: SiLeetcode, color: "#f59e0b", x: position_architecture.x, y: position_architecture.y+6, connections: [[position_architecture.x,position_architecture.y+7]] },
 ];
 
-// Hub positions in pixels (absolute within container)
-const hubPositions = [
-  { x: 180, y: 180 },   // Programming - top left
-  { x: 520, y: 160 },   // Backend - top center
-  { x: 860, y: 180 },   // Cloud - top right
-  { x: 520, y: 420 },   // GenAI - center (main)
-  { x: 180, y: 660 },   // LLMOps - bottom left
-  { x: 860, y: 660 },   // Architecture - bottom right
-];
+// Dynamically calculate grid bounds for full-width usage
+const cellSize = 120;
+const nodeRadius = 28;
+const minX = Math.min(...skillNodes.map(n => n.x));
+const maxX = Math.max(...skillNodes.map(n => n.x));
+const minY = Math.min(...skillNodes.map(n => n.y));
+const maxY = Math.max(...skillNodes.map(n => n.y));
 
-// Hub Node Component
-const HubNode = ({ 
-  hub, 
-  position, 
-  index, 
-  isInView 
-}: { 
-  hub: HubData; 
-  position: { x: number; y: number }; 
-  index: number;
-  isInView: boolean;
-}) => {
-  const Icon = hub.icon;
-  const isCenter = index === 3; // GenAI is center
+// Helper to get pixel position from grid, using minX/minY for left/top padding
+const getPos = (x: number, y: number) => ({
+  px: (x - minX) * cellSize + 60,
+  py: (y - minY) * cellSize + 60,
+});
 
+// Draw orthogonal path (right-angle) between two grid points
+function OrthogonalPath({ from, to, color }: { from: { x: number, y: number }, to: { x: number, y: number }, color: string }) {
+  const { px: x1, py: y1 } = getPos(from.x, from.y);
+  const { px: x2, py: y2 } = getPos(to.x, to.y);
+  // Go horizontal, then vertical (or vice versa)
+  const midX = x2;
+  const midY = y1;
   return (
-    <motion.div
-      className="absolute z-20"
-      style={{ 
-        left: position.x, 
-        top: position.y,
-        transform: "translate(-50%, -50%)"
-      }}
-      initial={{ opacity: 0, scale: 0 }}
-      animate={isInView ? { opacity: 1, scale: 1 } : {}}
-      transition={{ delay: 0.3 + index * 0.1, type: "spring", stiffness: 150 }}
-    >
-      {/* Outer pulse glow */}
-      <div 
-        className="absolute inset-0 rounded-full animate-pulse opacity-30"
-        style={{ 
-          background: `radial-gradient(circle, ${hub.colorHex}60 0%, transparent 70%)`,
-          transform: "translate(-50%, -50%) scale(2.5)",
-          left: "50%",
-          top: "50%",
-        }}
-      />
-      
-      {/* Hub circle with gradient ring */}
-      <div
-        className={`${isCenter ? "w-[100px] h-[100px]" : "w-[85px] h-[85px]"} rounded-full p-[3px] relative`}
-        style={{ 
-          background: `linear-gradient(135deg, ${hub.colorHex}, ${hub.colorHex}88)`,
-          boxShadow: `0 0 30px ${hub.colorHex}50, 0 0 60px ${hub.colorHex}25`,
-        }}
-      >
-        {/* Inner glassmorphism circle */}
-        <div 
-          className="w-full h-full rounded-full flex items-center justify-center relative overflow-hidden"
-          style={{
-            background: "rgba(15, 23, 42, 0.9)",
-            backdropFilter: "blur(12px)",
-          }}
-        >
-          {/* Inner glow */}
-          <div 
-            className="absolute inset-0 opacity-40"
-            style={{ 
-              background: `radial-gradient(circle at center, ${hub.colorHex}40, transparent 70%)`,
-            }}
-          />
-          <Icon className={`${isCenter ? "w-10 h-10" : "w-8 h-8"} relative z-10`} style={{ color: hub.colorHex }} />
-        </div>
-      </div>
-
-      {/* Hub Label */}
-      <div 
-        className="absolute left-1/2 whitespace-nowrap"
-        style={{ 
-          top: isCenter ? "110px" : "95px",
-          transform: "translateX(-50%)"
-        }}
-      >
-        <span 
-          className="text-xs font-bold uppercase tracking-wider"
-          style={{ 
-            color: hub.colorHex,
-            textShadow: `0 0 10px ${hub.colorHex}60`,
-          }}
-        >
-          {hub.shortName}
-        </span>
-      </div>
-    </motion.div>
-  );
-};
-
-// Tool Node Component
-const ToolNode = ({ 
-  tool, 
-  hubPosition,
-  delay, 
-  isInView,
-  hubColor
-}: { 
-  tool: ToolNode; 
-  hubPosition: { x: number; y: number };
-  delay: number;
-  isInView: boolean;
-  hubColor: string;
-}) => {
-  const Icon = tool.icon;
-  const toolX = hubPosition.x + tool.offsetX;
-  const toolY = hubPosition.y + tool.offsetY;
-
-  return (
-    <motion.div
-      className="absolute z-10"
-      style={{ 
-        left: toolX, 
-        top: toolY,
-        transform: "translate(-50%, -50%)"
-      }}
-      initial={{ opacity: 0, scale: 0 }}
-      animate={isInView ? { opacity: 1, scale: 1 } : {}}
-      transition={{ delay, type: "spring", stiffness: 200 }}
-    >
-      {/* Tool circle */}
-      <div
-        className="w-[50px] h-[50px] rounded-full p-[2px] relative group cursor-pointer"
-        style={{ 
-          background: `linear-gradient(135deg, ${tool.color}dd, ${tool.color}77)`,
-          boxShadow: `0 0 12px ${tool.color}40`,
-        }}
-      >
-        {/* Inner glassmorphism circle */}
-        <div 
-          className="w-full h-full rounded-full flex items-center justify-center relative overflow-hidden transition-all duration-300 group-hover:scale-110"
-          style={{
-            background: "rgba(15, 23, 42, 0.92)",
-            backdropFilter: "blur(8px)",
-          }}
-        >
-          {/* Inner glow */}
-          <div 
-            className="absolute inset-0 opacity-25 group-hover:opacity-50 transition-opacity"
-            style={{ 
-              background: `radial-gradient(circle at center, ${tool.color}50, transparent 70%)`,
-            }}
-          />
-          {Icon ? (
-            <Icon className="w-5 h-5 relative z-10" style={{ color: tool.color }} />
-          ) : (
-            <span 
-              className="text-[11px] font-bold relative z-10"
-              style={{ color: tool.color }}
-            >
-              {tool.name.slice(0, 2)}
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* Tool Label */}
-      <div 
-        className="absolute left-1/2 whitespace-nowrap"
-        style={{ 
-          top: "55px",
-          transform: "translateX(-50%)"
-        }}
-      >
-        <span className="text-[10px] font-medium text-muted-foreground">
-          {tool.name}
-        </span>
-      </div>
-    </motion.div>
-  );
-};
-
-// Connection Line Component (SVG)
-const ConnectionLine = ({
-  hubPos,
-  tool,
-  color,
-  delay,
-  isInView,
-}: {
-  hubPos: { x: number; y: number };
-  tool: ToolNode;
-  color: string;
-  delay: number;
-  isInView: boolean;
-}) => {
-  const toolX = hubPos.x + tool.offsetX;
-  const toolY = hubPos.y + tool.offsetY;
-  
-  return (
-    <motion.line
-      x1={hubPos.x}
-      y1={hubPos.y}
-      x2={toolX}
-      y2={toolY}
+    <polyline
+      points={`${x1},${y1} ${midX},${midY} ${x2},${y2}`}
+      fill="none"
       stroke={color}
-      strokeWidth="1.5"
-      strokeOpacity="0.4"
-      initial={{ pathLength: 0, opacity: 0 }}
-      animate={isInView ? { pathLength: 1, opacity: 1 } : {}}
-      transition={{ duration: 0.6, delay }}
-      filter="url(#lineGlow)"
+      strokeWidth="6"
+      strokeLinejoin="round"
+      strokeOpacity={0.3}
+      style={{ filter: `drop-shadow(0 0 6px ${color}66)` }}
     />
   );
-};
+}
+
+// Skill node visual
+function SkillNodeCircle({ node, isInView }: { node: SkillNode, isInView: boolean }) {
+  const { px, py } = getPos(node.x, node.y);
+  const Icon = node.icon;
+  return (
+    <motion.g
+      initial={{ opacity: 0, scale: 0 }}
+      animate={isInView ? { opacity: 1, scale: 1 } : {}}
+      transition={{ delay: 0.2 + (node.x + node.y) * 0.05, type: "spring", stiffness: 200 }}
+    >
+      <circle
+        cx={px}
+        cy={py}
+        r={nodeRadius}
+        fill="#0f172a"
+        stroke={node.color}
+        strokeWidth="4"
+        style={{ filter: `drop-shadow(0 0 12px ${node.color}99)` }}
+      />
+      {Icon ? (
+        <foreignObject x={px - 16} y={py - 16} width={32} height={32}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 32, height: 32 }}>
+            {Icon.Color ? (
+              <Icon.Color size={28} />
+            ) : (
+              <Icon style={{ color: node.color, width: 28, height: 28 }} />
+            )}
+          </div>
+        </foreignObject>
+      ) : (
+        <text x={px} y={py + 6} textAnchor="middle" fontSize="14" fill={node.color} fontWeight="bold">{node.name.slice(0,2)}</text>
+      )}
+      <text x={px} y={py + nodeRadius + 18} textAnchor="middle" fontSize="13" fill="#cbd5e1">{node.name}</text>
+    </motion.g>
+  );
+}
 
 const Skills = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
-  const isMobile = useIsMobile();
 
-  const containerWidth = 1040;
-  const containerHeight = 820;
+  // SVG size (dynamic based on min/max x/y)
+  const width = (maxX - minX + 1) * cellSize + 120;
+  const height = (maxY - minY + 1) * cellSize + 120;
 
   return (
-    <section id="skills" className="py-20 relative">
+    <section id="skills" className="pt-20 pb-0 relative">
       {/* Background gradients */}
       <div className="absolute inset-0 overflow-hidden">
         <div 
@@ -389,140 +222,52 @@ const Skills = () => {
           />
         </motion.div>
 
-        {/* Desktop: Static Hierarchical Skill Graph */}
-        {!isMobile && (
-          <div className="hidden lg:flex justify-center mb-12">
-            <div 
-              className="relative"
-              style={{ width: containerWidth, height: containerHeight }}
-            >
-              {/* SVG for all connection lines */}
-              <svg 
-                className="absolute inset-0 pointer-events-none"
-                width={containerWidth}
-                height={containerHeight}
-              >
-                <defs>
-                  {/* Glow filter for lines */}
-                  <filter id="lineGlow" x="-50%" y="-50%" width="200%" height="200%">
-                    <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
-                    <feMerge>
-                      <feMergeNode in="coloredBlur"/>
-                      <feMergeNode in="SourceGraphic"/>
-                    </feMerge>
-                  </filter>
-                  
-                  {/* Gradient for inter-hub lines */}
-                  <linearGradient id="connectionGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="hsl(217, 91%, 60%)" />
-                    <stop offset="100%" stopColor="hsl(270, 60%, 50%)" />
-                  </linearGradient>
-                </defs>
-
-                {/* Draw connection lines from each hub to its tools */}
-                {hubsData.map((hub, hubIndex) => {
-                  const hubPos = hubPositions[hubIndex];
-                  
-                  return hub.tools.map((tool, toolIndex) => (
-                    <ConnectionLine
-                      key={`${hubIndex}-${toolIndex}`}
-                      hubPos={hubPos}
-                      tool={tool}
-                      color={hub.colorHex}
-                      delay={0.4 + hubIndex * 0.08 + toolIndex * 0.03}
-                      isInView={isInView}
-                    />
-                  ));
-                })}
-
-                {/* Inter-hub connections (subtle dashed lines) */}
-                {[
-                  { from: 0, to: 1 },
-                  { from: 1, to: 2 },
-                  { from: 0, to: 3 },
-                  { from: 1, to: 3 },
-                  { from: 2, to: 3 },
-                  { from: 3, to: 4 },
-                  { from: 3, to: 5 },
-                  { from: 4, to: 5 },
-                ].map((conn, idx) => (
-                  <motion.line
-                    key={`hub-conn-${idx}`}
-                    x1={hubPositions[conn.from].x}
-                    y1={hubPositions[conn.from].y}
-                    x2={hubPositions[conn.to].x}
-                    y2={hubPositions[conn.to].y}
-                    stroke="url(#connectionGradient)"
-                    strokeWidth="1"
-                    strokeOpacity="0.12"
-                    strokeDasharray="6 6"
-                    initial={{ pathLength: 0, opacity: 0 }}
-                    animate={isInView ? { pathLength: 1, opacity: 1 } : {}}
-                    transition={{ duration: 1, delay: 0.2 + idx * 0.04 }}
-                  />
-                ))}
-              </svg>
-
-              {/* Render all hub clusters */}
-              {hubsData.map((hub, hubIndex) => {
-                const hubPos = hubPositions[hubIndex];
-
+        {/* Desktop: Brain Circuit SVG */}
+        <div className="hidden lg:flex justify-center mb-12">
+          <svg width={width} height={height} className="block" style={{ maxWidth: "100%" }}>
+            {/* Draw all connections first */}
+            {skillNodes.map((node, idx) =>
+              node.connections.map((conn, cidx) => {
+                const target = skillNodes.find(n => n.x === conn[0] && n.y === conn[1]);
+                if (!target) return null;
                 return (
-                  <div key={hub.name}>
-                    {/* Hub Node */}
-                    <HubNode
-                      hub={hub}
-                      position={hubPos}
-                      index={hubIndex}
-                      isInView={isInView}
-                    />
-
-                    {/* Tool Nodes */}
-                    {hub.tools.map((tool, toolIndex) => (
-                      <ToolNode
-                        key={tool.name}
-                        tool={tool}
-                        hubPosition={hubPos}
-                        delay={0.5 + hubIndex * 0.08 + toolIndex * 0.04}
-                        isInView={isInView}
-                        hubColor={hub.colorHex}
-                      />
-                    ))}
-                  </div>
+                  <OrthogonalPath key={`${idx}-${cidx}`} from={{ x: node.x, y: node.y }} to={{ x: target.x, y: target.y }} color={node.color} />
                 );
-              })}
-            </div>
-          </div>
-        )}
+              })
+            )}
+            {/* Draw all nodes */}
+            {skillNodes.map((node, idx) => (
+              <SkillNodeCircle key={node.name} node={node} isInView={isInView} />
+            ))}
+          </svg>
+        </div>
 
         {/* Mobile & Tablet: Card Grid */}
-        <div className={`${isMobile ? "block" : "lg:hidden"}`}>
+        <div className="lg:hidden">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {hubsData.map((category, index) => {
-              const Icon = category.icon;
+            {skillNodes.map((node, idx) => {
+              const Icon = node.icon;
               return (
                 <motion.div
-                  key={category.name}
+                  key={node.name}
                   initial={{ opacity: 0, y: 30 }}
                   animate={isInView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ delay: 0.2 + index * 0.1 }}
-                  className="glass rounded-xl p-6 card-hover neon-border"
+                  transition={{ delay: 0.2 + idx * 0.05 }}
+                  className="glass rounded-xl p-6 card-hover neon-border flex items-center gap-4"
                 >
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${category.color} flex items-center justify-center`}>
-                      <Icon className="w-6 h-6 text-white" />
-                    </div>
-                    <h3 className="font-semibold text-lg">{category.name}</h3>
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ background: node.color + '22' }}>
+                    {Icon ? (
+                      Icon.Color ? (
+                        <Icon.Color size={28} />
+                      ) : (
+                        <Icon className="w-7 h-7" style={{ color: node.color }} />
+                      )
+                    ) : (
+                      <span className="font-bold text-lg" style={{ color: node.color }}>{node.name.slice(0,2)}</span>
+                    )}
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    {category.tools.map((tool) => (
-                      <span
-                        key={tool.name}
-                        className="px-3 py-1 rounded-full text-sm bg-muted text-muted-foreground hover:bg-primary/20 hover:text-foreground transition-colors"
-                      >
-                        {tool.name}
-                      </span>
-                    ))}
+                  <div>
+                    <h3 className="font-semibold text-base">{node.name}</h3>
                   </div>
                 </motion.div>
               );
