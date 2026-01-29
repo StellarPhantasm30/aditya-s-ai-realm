@@ -26,7 +26,7 @@ const projects: Project[] = [
     gradient: "from-blue-600 to-cyan-600",
     type: "enterprise",
     links: {
-      docs: "#",
+      docs: "https://medium.com/@aditya_dev30",
     },
   },
   {
@@ -36,9 +36,9 @@ const projects: Project[] = [
     gradient: "from-purple-600 to-pink-600",
     type: "personal",
     links: {
-      code: "#",
+      code: "https://github.com/StellarPhantasm30",
       demo: "#",
-      docs: "#",
+      docs: "https://medium.com/@aditya_dev30",
     },
   },
   {
@@ -48,7 +48,7 @@ const projects: Project[] = [
     gradient: "from-green-600 to-emerald-600",
     type: "enterprise",
     links: {
-      docs: "#",
+      docs: "https://medium.com/@aditya_dev30",
     },
   },
   {
@@ -58,7 +58,7 @@ const projects: Project[] = [
     gradient: "from-orange-600 to-amber-600",
     type: "enterprise",
     links: {
-      docs: "#",
+      docs: "https://medium.com/@aditya_dev30",
     },
   },
   {
@@ -68,9 +68,9 @@ const projects: Project[] = [
     gradient: "from-red-600 to-rose-600",
     type: "personal",
     links: {
-      code: "#",
+      code: "https://github.com/StellarPhantasm30",
       demo: "#",
-      docs: "#",
+      docs: "https://medium.com/@aditya_dev30",
     },
   },
   {
@@ -80,9 +80,9 @@ const projects: Project[] = [
     gradient: "from-indigo-600 to-violet-600",
     type: "personal",
     links: {
-      code: "#",
+      code: "https://github.com/StellarPhantasm30",
       demo: "#",
-      docs: "#",
+      docs: "https://medium.com/@aditya_dev30",
     },
   },
 ];
