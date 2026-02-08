@@ -1,9 +1,11 @@
 import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { ExternalLink, Github, FileText, Sparkles, Briefcase, Code } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import ProjectDocsSheet from "./ProjectDocsSheet";
+import { projectDocumentation, ProjectDocumentation } from "@/data/projectDocs";
 
 interface Project {
   title: string;
@@ -107,6 +109,13 @@ const ProjectTypeBadge = ({ type }: { type: "personal" | "enterprise" }) => {
 const Projects = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  const handleDocsClick = (project: Project) => {
+    setSelectedProject(project);
+    setSheetOpen(true);
+  };
 
   return (
     <section id="projects" className="py-0 relative">
@@ -139,8 +148,8 @@ const Projects = () => {
           {projects.map((project, index) => {
             const hasCode = !!project.links.code;
             const hasDemo = !!project.links.demo;
-            const hasDocs = !!project.links.docs;
-            const buttonCount = [hasCode, hasDemo, hasDocs].filter(Boolean).length;
+            const hasDocumentation = !!projectDocumentation[project.title];
+            const buttonCount = [hasCode, hasDemo, hasDocumentation].filter(Boolean).length;
 
             return (
               <motion.div
@@ -214,17 +223,15 @@ const Projects = () => {
                           </a>
                         </Button>
                       )}
-                      {hasDocs && (
+                      {hasDocumentation && (
                         <Button
                           size="sm"
                           variant="outline"
                           className={buttonCount === 1 ? "w-full" : "flex-1 min-w-[80px]"}
-                          asChild
+                          onClick={() => handleDocsClick(project)}
                         >
-                          <a href={project.links.docs} target="_blank" rel="noopener noreferrer">
-                            <FileText className="w-4 h-4 mr-1" />
-                            Docs
-                          </a>
+                          <FileText className="w-4 h-4 mr-1" />
+                          Docs
                         </Button>
                       )}
                     </div>
@@ -234,6 +241,14 @@ const Projects = () => {
             );
           })}
         </div>
+
+        {/* Documentation Sheet */}
+        <ProjectDocsSheet
+          project={selectedProject}
+          documentation={selectedProject ? projectDocumentation[selectedProject.title] || null : null}
+          open={sheetOpen}
+          onOpenChange={setSheetOpen}
+        />
       </div>
     </section>
   );
