@@ -79,7 +79,7 @@ const Hero = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-muted-foreground text-lg mb-2"
+              className="text-foreground text-xl md:text-2xl font-medium mb-2"
             >
               Hi, I am
             </motion.p>
