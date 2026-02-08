@@ -37,7 +37,7 @@ const AskBot = () => {
       if (prompt.toLowerCase().includes("skills")) {
         response = "Aditya excels in Generative AI, LLMOps, and building enterprise-scale AI systems. His core strengths include LangChain, LangGraph, Python, FastAPI, and cloud platforms like AWS and Azure. He's particularly skilled at system design and building production-ready AI solutions.";
       } else if (prompt.toLowerCase().includes("project")) {
-        response = "Aditya has built several impressive projects including Validate.AI (an enterprise LLMOps platform), Agentic RAG systems for 900+ API testing, and autonomous AIOps agents. Each project demonstrates his ability to deliver scalable, production-ready solutions.";
+        response = "Aditya has built several impressive projects including SentinelAI (an enterprise LLMOps platform), Agentic RAG systems for 900+ API testing, and autonomous AIOps agents. Each project demonstrates his ability to deliver scalable, production-ready solutions.";
       } else if (prompt.toLowerCase().includes("help") || prompt.toLowerCase().includes("organization")) {
         response = "Aditya can help your organization with end-to-end GenAI development, building custom guardrails and evaluation pipelines, implementing LLMOps infrastructure, and deploying enterprise-ready AI systems with proper observability and cost controls.";
       } else {

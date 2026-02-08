@@ -3,7 +3,7 @@ import { useInView } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 import { Terminal } from "lucide-react";
 
-const aboutContent = `> Senior AI Engineer at Synechron working on Validate.AI
+const aboutContent = `> Senior AI Engineer at Synechron working on SentinelAI
 > Building enterprise-wide LLMOps platform handling 100% organizational LLM traffic
 > Implementing RBAC, observability, cost tracking, and compliance systems
 > Standardizing LLM interfaces across the organization

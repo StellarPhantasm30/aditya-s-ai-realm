@@ -22,7 +22,7 @@ interface Project {
 
 const projects: Project[] = [
   {
-    title: "Validate.AI",
+    title: "SentinelAI",
     description: "Enterprise-wide LLMOps platform handling 100% organizational LLM traffic with RBAC, observability, cost tracking, and compliance.",
     tags: ["LLMOps", "Python", "FastAPI", "LiteLLM", "Langfuse"],
     gradient: "from-blue-600 to-cyan-600",
