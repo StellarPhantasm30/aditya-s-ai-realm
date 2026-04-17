@@ -26,19 +26,19 @@ export const projectDocumentation: Record<string, ProjectDocumentation> = {
         `
           Business Problems:
           As LLM adoption accelerated across teams, organizations faced several systemic risks:
-          * No centralized control over who could access which models and for what purpose
-          * Rising and unpredictable API costs due to uncontrolled usage
-          * Inconsistent AI behavior across teams, leading to compliance and reputational risks
-          * Difficulty enforcing Responsible AI policies uniformly
-          * Limited visibility into usage, cost, and safety incidents
-          * High dependency on single vendors, increasing lock-in risks
+          - No centralized control over who could access which models and for what purpose
+          - Rising and unpredictable API costs due to uncontrolled usage
+          - Inconsistent AI behavior across teams, leading to compliance and reputational risks
+          - Difficulty enforcing Responsible AI policies uniformly
+          - Limited visibility into usage, cost, and safety incidents
+          - High dependency on single vendors, increasing lock-in risks
           
           Technical Problems:
-          * Teams directly calling LLM APIs with no governance layer
-          * Guardrails implemented inconsistently or not at all
-          * No standardized RBAC for AI usage
-          * No unified telemetry for tokens, latency, errors, or violations
-          * Manual, fragmented onboarding of new models and use cases
+          - Teams directly calling LLM APIs with no governance layer
+          - Guardrails implemented inconsistently or not at all
+          - No standardized RBAC for AI usage
+          - No unified telemetry for tokens, latency, errors, or violations
+          - Manual, fragmented onboarding of new models and use cases
           SentinelAI was designed to solve these problems holistically.
           `,
       role: `
