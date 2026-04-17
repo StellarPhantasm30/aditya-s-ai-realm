@@ -68,13 +68,12 @@ const Notes = () => {
             Technical <span className="gradient-text">Notes</span>
           </h1>
           <p className="text-lg text-muted-foreground mb-6">
-            Visual breakdowns of the systems I build and the ideas I explore — exported
-            from Figma, free to download.
+            Visual breakdowns of the systems I build and the ideas I explore, free to download.
           </p>
           <div className="flex flex-wrap items-center gap-3">
             <Button asChild variant="outline" size="sm">
               <a
-                href="https://www.linkedin.com/in/aditya-ravi-raj/"
+                href="https://www.linkedin.com/in/adityadev30/"
                 target="_blank"
                 rel="noopener noreferrer"
               >
