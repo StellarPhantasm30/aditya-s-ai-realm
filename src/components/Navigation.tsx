@@ -1,13 +1,17 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
-const navLinks = [
+type NavLinkItem = { href: string; label: string; route?: string };
+
+const navLinks: NavLinkItem[] = [
   { href: "#about", label: "About Me" },
   { href: "#skills", label: "Skills" },
   { href: "#projects", label: "Projects" },
   { href: "#certifications", label: "Certifications" },
+  { href: "/notes", label: "Notes", route: "/notes" },
   { href: "#bot", label: "Ask My Bot" },
   { href: "#contact", label: "Contact" },
 ];
@@ -15,6 +19,8 @@ const navLinks = [
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,12 +30,21 @@ const Navigation = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const scrollToSection = (href: string) => {
-    const element = document.querySelector(href);
+  const handleNavClick = (link: NavLinkItem) => {
+    setIsMobileMenuOpen(false);
+    if (link.route) {
+      navigate(link.route);
+      return;
+    }
+    // Hash link — if not on home, navigate home then scroll
+    if (location.pathname !== "/") {
+      navigate("/" + link.href);
+      return;
+    }
+    const element = document.querySelector(link.href);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
     }
-    setIsMobileMenuOpen(false);
   };
 
   return (
@@ -45,10 +60,14 @@ const Navigation = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <motion.a
-            href="#"
+            href="/"
             onClick={(e) => {
               e.preventDefault();
-              window.scrollTo({ top: 0, behavior: "smooth" });
+              if (location.pathname !== "/") {
+                navigate("/");
+              } else {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }
             }}
             className="text-2xl font-bold gradient-text cursor-pointer"
             whileHover={{ scale: 1.05 }}
@@ -61,7 +80,7 @@ const Navigation = () => {
             {navLinks.map((link) => (
               <motion.button
                 key={link.href}
-                onClick={() => scrollToSection(link.href)}
+                onClick={() => handleNavClick(link)}
                 className="text-muted-foreground hover:text-foreground transition-colors relative group"
                 whileHover={{ scale: 1.05 }}
               >
@@ -96,7 +115,7 @@ const Navigation = () => {
               {navLinks.map((link) => (
                 <button
                   key={link.href}
-                  onClick={() => scrollToSection(link.href)}
+                  onClick={() => handleNavClick(link)}
                   className="text-left text-muted-foreground hover:text-foreground transition-colors py-2"
                 >
                   {link.label}
