@@ -23,7 +23,7 @@ interface Project {
 const projects: Project[] = [
   {
     title: "SentinelAI",
-    description: "Enterprise-wide LLMOps platform handling 100% organizational LLM traffic with RBAC, observability, cost tracking, and compliance.",
+    description: "SentinelAI is an enterprise-wide LLMOps and AI governance platform that acts as a single gateway for all AI model interactions inside an organization. It provides centralized control over access, safety, cost, observability, and compliance while remaining minimally intrusive for developers. The platform sits between applications and model providers, enforcing guardrails, routing requests intelligently, optimizing costs through caching and model selection, and offering full visibility into how AI is used across teams.",
     tags: ["LLMOps", "Python", "FastAPI", "LiteLLM", "Langfuse"],
     gradient: "from-blue-600 to-cyan-600",
     type: "enterprise",

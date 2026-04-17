@@ -114,7 +114,7 @@ const ProjectDocsSheet = ({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.15 }}
               >
-                <SectionHeader icon={User} title="Your Role" />
+                <SectionHeader icon={User} title="My Role" />
                 <p className="text-muted-foreground leading-relaxed">
                   {documentation.overview.role}
                 </p>

@@ -28,6 +28,7 @@ const Footer = () => {
         >
           <motion.path
             d="M0,64 C360,120 720,0 1080,64 C1260,96 1440,64 1440,64 L1440,120 L0,120 Z"
+            
             fill="url(#wave-gradient)"
             animate={{
               d: [
