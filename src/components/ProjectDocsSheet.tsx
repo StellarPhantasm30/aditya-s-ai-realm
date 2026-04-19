@@ -103,9 +103,7 @@ const ProjectDocsSheet = ({
                 transition={{ delay: 0.1 }}
               >
                 <SectionHeader icon={Target} title="Problem Statement" />
-                <p className="text-muted-foreground leading-relaxed">
-                  {documentation.overview.problem}
-                </p>
+                <MarkdownRenderer content={documentation.overview.problem} />
               </motion.div>
 
               {/* Role & Ownership */}
@@ -115,9 +113,7 @@ const ProjectDocsSheet = ({
                 transition={{ delay: 0.15 }}
               >
                 <SectionHeader icon={User} title="My Role" />
-                <p className="text-muted-foreground leading-relaxed">
-                  {documentation.overview.role}
-                </p>
+                <MarkdownRenderer content={documentation.overview.role} />
               </motion.div>
 
               {/* Tech Stack */}
