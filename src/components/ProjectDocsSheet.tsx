@@ -180,8 +180,9 @@ const ProjectDocsSheet = ({
                 </CollapsibleTrigger>
 
                 <CollapsibleContent className="space-y-6 pt-4">
-                  {/* Mermaid Diagram */}
-                  {documentation.architecture.diagram && (
+                  {/* Mermaid Diagram — lazy mount once expanded so the
+                      diagram renders against a visible container */}
+                  {architectureOpen && documentation.architecture.diagram && (
                     <div>
                       <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-3">
                         System Architecture
