@@ -142,9 +142,7 @@ const ProjectDocsSheet = ({
                 transition={{ delay: 0.25 }}
               >
                 <SectionHeader icon={Gauge} title="Scale & Constraints" />
-                <p className="text-muted-foreground leading-relaxed">
-                  {documentation.overview.scale}
-                </p>
+                <MarkdownRenderer content={documentation.overview.scale} />
               </motion.div>
 
               {/* Outcome */}
@@ -154,9 +152,7 @@ const ProjectDocsSheet = ({
                 transition={{ delay: 0.3 }}
               >
                 <SectionHeader icon={Award} title="Outcome & Impact" />
-                <p className="text-muted-foreground leading-relaxed">
-                  {documentation.overview.outcome}
-                </p>
+                <MarkdownRenderer content={documentation.overview.outcome} />
               </motion.div>
             </div>
 
