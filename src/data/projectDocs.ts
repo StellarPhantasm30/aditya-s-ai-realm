@@ -22,38 +22,34 @@ export interface ProjectDocumentation {
 export const projectDocumentation: Record<string, ProjectDocumentation> = {
   "SentinelAI": {
     overview: {
-      problem:
-        `
-          Business Problems:
-          As LLM adoption accelerated across teams, organizations faced several systemic risks:
-          - No centralized control over who could access which models and for what purpose
-          - Rising and unpredictable API costs due to uncontrolled usage
-          - Inconsistent AI behavior across teams, leading to compliance and reputational risks
-          - Difficulty enforcing Responsible AI policies uniformly
-          - Limited visibility into usage, cost, and safety incidents
-          - High dependency on single vendors, increasing lock-in risks
-          
-          Technical Problems:
-          - Teams directly calling LLM APIs with no governance layer
-          - Guardrails implemented inconsistently or not at all
-          - No standardized RBAC for AI usage
-          - No unified telemetry for tokens, latency, errors, or violations
-          - Manual, fragmented onboarding of new models and use cases
-          SentinelAI was designed to solve these problems holistically.
-          `,
-      role: `
-      Lead AI Engineer responsible for the core routing, guardrail and caching engine, RBAC implementation, and integration with observability platforms.
+      problem: `As LLM adoption accelerated across teams, organizations faced systemic risks that needed a unified governance layer.
 
-      Ownership Areas:
-      Designed and implemented the core routing engine for all LLM traffic
-      Defined and implemented RBAC across programs, applications, and users
-      Architected the guardrail framework (central + custom)
-      Designed the program → application → user hierarchy
-      Integrated observability and cost tracking using Langfuse
-      Led design decisions around caching, routing, and extensibility
-      Collaborated with platform and security stakeholders to align with Responsible AI and compliance requirements
-          `,
+### Business Problems
+- No centralized control over who could access which models and for what purpose
+- Rising and unpredictable API costs due to uncontrolled usage
+- Inconsistent AI behavior across teams, leading to compliance and reputational risks
+- Difficulty enforcing Responsible AI policies uniformly
+- Limited visibility into usage, cost, and safety incidents
+- High dependency on single vendors, increasing lock-in risks
 
+### Technical Problems
+- Teams directly calling LLM APIs with no governance layer
+- Guardrails implemented inconsistently or not at all
+- No standardized RBAC for AI usage
+- No unified telemetry for tokens, latency, errors, or violations
+- Manual, fragmented onboarding of new models and use cases
+
+**SentinelAI was designed to solve these problems holistically.**`,
+      role: `**Lead AI Engineer** responsible for the core routing, guardrail and caching engine, RBAC implementation, and integration with observability platforms.
+
+### Ownership Areas
+- Designed and implemented the core routing engine for all LLM traffic
+- Defined and implemented RBAC across programs, applications, and users
+- Architected the guardrail framework (central + custom)
+- Designed the program → application → user hierarchy
+- Integrated observability and cost tracking using Langfuse
+- Led design decisions around caching, routing, and extensibility
+- Collaborated with platform and security stakeholders to align with Responsible AI and compliance requirements`,
       techStack: ["Python", "FastAPI", "LiteLLM", "Langfuse", "Redis", "PostgreSQL", "ClickHouse", "Langchain", "Langgraph", "Docker", "React", "SQLAlchemy"],
       scale:
         "Processing 100% of organizational LLM traffic (~50K+ requests/day). Designed for horizontal scaling with Redis-backed session and semantic caching management.",

@@ -103,9 +103,7 @@ const ProjectDocsSheet = ({
                 transition={{ delay: 0.1 }}
               >
                 <SectionHeader icon={Target} title="Problem Statement" />
-                <p className="text-muted-foreground leading-relaxed">
-                  {documentation.overview.problem}
-                </p>
+                <MarkdownRenderer content={documentation.overview.problem} />
               </motion.div>
 
               {/* Role & Ownership */}
@@ -115,9 +113,7 @@ const ProjectDocsSheet = ({
                 transition={{ delay: 0.15 }}
               >
                 <SectionHeader icon={User} title="My Role" />
-                <p className="text-muted-foreground leading-relaxed">
-                  {documentation.overview.role}
-                </p>
+                <MarkdownRenderer content={documentation.overview.role} />
               </motion.div>
 
               {/* Tech Stack */}
@@ -146,9 +142,7 @@ const ProjectDocsSheet = ({
                 transition={{ delay: 0.25 }}
               >
                 <SectionHeader icon={Gauge} title="Scale & Constraints" />
-                <p className="text-muted-foreground leading-relaxed">
-                  {documentation.overview.scale}
-                </p>
+                <MarkdownRenderer content={documentation.overview.scale} />
               </motion.div>
 
               {/* Outcome */}
@@ -158,9 +152,7 @@ const ProjectDocsSheet = ({
                 transition={{ delay: 0.3 }}
               >
                 <SectionHeader icon={Award} title="Outcome & Impact" />
-                <p className="text-muted-foreground leading-relaxed">
-                  {documentation.overview.outcome}
-                </p>
+                <MarkdownRenderer content={documentation.overview.outcome} />
               </motion.div>
             </div>
 
@@ -188,8 +180,9 @@ const ProjectDocsSheet = ({
                 </CollapsibleTrigger>
 
                 <CollapsibleContent className="space-y-6 pt-4">
-                  {/* Mermaid Diagram */}
-                  {documentation.architecture.diagram && (
+                  {/* Mermaid Diagram — lazy mount once expanded so the
+                      diagram renders against a visible container */}
+                  {architectureOpen && documentation.architecture.diagram && (
                     <div>
                       <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-3">
                         System Architecture
