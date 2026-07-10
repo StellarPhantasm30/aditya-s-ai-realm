@@ -1,0 +1,8 @@
+{
+  "functions": {
+    "api/chat.ts": {
+      "includeFiles": "providers.yaml",
+      "maxDuration": 30
+    }
+  }
+}
