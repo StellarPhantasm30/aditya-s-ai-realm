@@ -38,7 +38,9 @@ function errorResponse(message: string, status = 500): Response {
   return createUIMessageStreamResponse({ stream, status });
 }
 
-export default async function handler(req: Request): Promise<Response> {
+async function handler(req: Request): Promise<Response> {
+  console.info(`[api/chat] ${req.method} request received`);
+
   if (req.method !== "POST") {
     return new Response("Method Not Allowed", { status: 405 });
   }
@@ -51,6 +53,8 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   const messages = body.messages ?? [];
+  console.info(`[api/chat] parsed ${messages.length} message(s)`);
+
   if (!Array.isArray(messages) || messages.length === 0) {
     return errorResponse("No messages provided.", 400);
   }
@@ -63,7 +67,10 @@ export default async function handler(req: Request): Promise<Response> {
       .map((p) => (p as { text: string }).text)
       .join(" ") ?? "";
   const faq = matchFaq(lastText);
-  if (faq) return faqResponse(faq);
+  if (faq) {
+    console.info("[api/chat] answered from FAQ cache");
+    return faqResponse(faq);
+  }
 
   try {
     return await routeStream({
@@ -80,3 +87,5 @@ export default async function handler(req: Request): Promise<Response> {
     return errorResponse(msg, 503);
   }
 }
+
+export default { fetch: handler };
