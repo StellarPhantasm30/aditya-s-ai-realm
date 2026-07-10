@@ -1,0 +1,15 @@
+providers:
+  groq:
+    enabled: true
+    priority: 1
+    api_key_env: GROQ_API_KEY
+    default_model: llama-3.3-70b-versatile
+    concurrency: 3
+  google:
+    enabled: true
+    priority: 2
+    api_key_env: GOOGLE_API_KEY
+    default_model: gemini-3.5-flash
+    concurrency: 3
+registry:
+  ttl_days: 30
