@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { parse } from "yaml";
 import { z } from "zod";
-import type { AppConfig, ProviderConfig } from "./types";
+import type { AppConfig, ProviderConfig } from "./types.js";
 
 const schema = z.object({
   providers: z.record(
