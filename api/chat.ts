@@ -1,8 +1,8 @@
 import type { UIMessage } from "ai";
 import { createUIMessageStream, createUIMessageStreamResponse } from "ai";
-import { AllProvidersFailedError, friendlyMessage } from "../lib/ai/errors.js";
-import { matchFaq } from "../lib/ai/faq.js";
-import { routeStream } from "../lib/ai/router.js";
+import { AllProvidersFailedError, friendlyMessage } from "./_ai/errors.js";
+import { matchFaq } from "./_ai/faq.js";
+import { routeStream } from "./_ai/router.js";
 
 export const config = { maxDuration: 30 };
 
