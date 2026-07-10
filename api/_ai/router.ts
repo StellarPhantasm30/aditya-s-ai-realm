@@ -8,7 +8,6 @@ import {
 } from "./errors.js";
 import { createGoogleProvider } from "./providers/google.js";
 import { createGroqProvider } from "./providers/groq.js";
-import { getModelsFor, getRegistry } from "./registry.js";
 import { getSemaphore } from "./semaphore.js";
 import type { Provider, ProviderConfig } from "./types.js";
 
@@ -27,19 +26,9 @@ function buildProviders(): { cfg: ProviderConfig; provider: Provider }[] {
     .filter(({ provider }) => provider.isConfigured());
 }
 
-async function candidateModels(
-  provider: Provider,
-  primary: string,
-): Promise<string[]> {
-  const list = [primary];
-  try {
-    const providers = buildProviders().map((p) => p.provider);
-    const models = await getModelsFor(providers, provider.id);
-    for (const m of models) if (!list.includes(m.id)) list.push(m.id);
-  } catch {
-    /* registry unavailable — use only the default model */
-  }
-  return list;
+function timeoutSignal(signal: AbortSignal | undefined, ms: number): AbortSignal {
+  const timeout = AbortSignal.timeout(ms);
+  return signal ? AbortSignal.any([signal, timeout]) : timeout;
 }
 
 export interface RouteParams {
@@ -59,40 +48,66 @@ export async function routeStream(params: RouteParams): Promise<Response> {
   if (entries.length === 0) throw new AllProvidersFailedError("No providers configured");
 
   const modelMessages = convertToModelMessages(params.messages);
+  const abortSignal = timeoutSignal(params.abortSignal, 25_000);
   const errors: string[] = [];
-
-  // Warm the registry in the background; don't block the request.
-  void getRegistry(entries.map((e) => e.provider)).catch(() => {});
+  console.info(
+    "[api/chat] configured providers",
+    entries.map(({ cfg }) => `${cfg.id}:${cfg.defaultModel}`).join(", "),
+  );
 
   for (const { cfg, provider } of entries) {
     const sem = getSemaphore(cfg.id, cfg.concurrency);
     const release = await sem.acquire();
-    const modelIds = await candidateModels(provider, cfg.defaultModel);
+    let released = false;
+    const releaseOnce = () => {
+      if (released) return;
+      released = true;
+      release();
+    };
 
-    for (const modelId of modelIds) {
+    for (const modelId of [cfg.defaultModel]) {
       try {
+        console.info(`[api/chat] starting ${cfg.id}/${modelId}`);
         const result = streamText({
           model: provider.getLanguageModel(modelId),
           system: params.system,
           messages: modelMessages,
-          abortSignal: params.abortSignal,
+          abortSignal,
           onError: ({ error }) => {
             console.error(`[ai:${cfg.id}:${modelId}] stream error`, error);
+            releaseOnce();
           },
-          onFinish: () => release(),
+          onAbort: () => {
+            console.warn(`[ai:${cfg.id}:${modelId}] stream aborted`);
+            releaseOnce();
+          },
+          onFinish: () => {
+            console.info(`[ai:${cfg.id}:${modelId}] stream finished`);
+            releaseOnce();
+          },
         });
 
         return result.toUIMessageStreamResponse({
           onError: (error) => friendlyMessage(error),
+          consumeSseStream: async ({ stream }) => {
+            try {
+              await stream.pipeTo(new WritableStream());
+            } catch (error) {
+              console.error(`[ai:${cfg.id}:${modelId}] sse consume error`, error);
+            } finally {
+              releaseOnce();
+            }
+          },
         });
       } catch (e) {
         const err = classifyError(e, cfg.id);
         errors.push(`${cfg.id}/${modelId}: ${err.message}`);
+        console.error(`[ai:${cfg.id}:${modelId}] start failed`, err);
         if (!(err instanceof RateLimitError)) break;
       }
     }
 
-    release();
+    releaseOnce();
   }
 
   throw new AllProvidersFailedError(errors.join(" | "));
