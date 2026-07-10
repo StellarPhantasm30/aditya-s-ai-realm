@@ -4,7 +4,7 @@ import { AllProvidersFailedError, friendlyMessage } from "../lib/ai/errors.js";
 import { matchFaq } from "../lib/ai/faq.js";
 import { routeStream } from "../lib/ai/router.js";
 
-export const config = { runtime: "nodejs", maxDuration: 30 };
+export const config = { maxDuration: 30 };
 
 const SYSTEM_PROMPT = `You are Aditya's professional AI assistant on his portfolio website.
 Answer questions about his skills, projects, and experience concisely (2-4 short paragraphs max).

@@ -1,8 +1,28 @@
-import { readFileSync } from "node:fs";
-import path from "node:path";
 import { parse } from "yaml";
 import { z } from "zod";
 import type { AppConfig, ProviderConfig } from "./types.js";
+
+// providers.yaml is embedded here as a string constant so Vercel's serverless
+// bundler doesn't have to ship an external file. The file at the repo root
+// stays as the human-readable source of truth — keep them in sync when
+// editing (or drop a build step that syncs one from the other).
+const PROVIDERS_YAML = `
+providers:
+  groq:
+    enabled: true
+    priority: 1
+    api_key_env: GROQ_API_KEY
+    default_model: llama-3.3-70b-versatile
+    concurrency: 3
+  google:
+    enabled: true
+    priority: 2
+    api_key_env: GOOGLE_API_KEY
+    default_model: gemini-2.5-flash
+    concurrency: 3
+registry:
+  ttl_days: 30
+`;
 
 const schema = z.object({
   providers: z.record(
@@ -22,25 +42,9 @@ const schema = z.object({
 
 let cached: AppConfig | null = null;
 
-function locateYaml(): string {
-  // Vercel bundles files listed in vercel.json `includeFiles` next to the fn.
-  const candidates = [
-    path.join(process.cwd(), "providers.yaml"),
-    path.join(process.cwd(), "../../providers.yaml"),
-  ];
-  for (const p of candidates) {
-    try {
-      return readFileSync(p, "utf8");
-    } catch {
-      /* try next */
-    }
-  }
-  throw new Error("providers.yaml not found");
-}
-
 export function loadConfig(): AppConfig {
   if (cached) return cached;
-  const raw = parse(locateYaml());
+  const raw = parse(PROVIDERS_YAML);
   const parsed = schema.parse(raw);
   const providers: ProviderConfig[] = Object.entries(parsed.providers).map(
     ([id, p]) => ({
