@@ -1,7 +1,7 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import type { LanguageModel } from "ai";
-import { classifyError } from "../errors";
-import type { ModelInfo, Provider } from "../types";
+import { classifyError } from "../errors.js";
+import type { ModelInfo, Provider } from "../types.js";
 
 function rankGoogleModel(id: string): number {
   const lower = id.toLowerCase();

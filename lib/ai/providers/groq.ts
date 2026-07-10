@@ -1,7 +1,7 @@
 import { createGroq } from "@ai-sdk/groq";
 import type { LanguageModel } from "ai";
-import { classifyError } from "../errors";
-import type { ModelInfo, Provider } from "../types";
+import { classifyError } from "../errors.js";
+import type { ModelInfo, Provider } from "../types.js";
 
 // Rank helper: bigger/newer text-focused models score higher.
 function rankGroqModel(id: string): number {

@@ -1,16 +1,16 @@
 import { streamText, convertToModelMessages, type UIMessage } from "ai";
-import { loadConfig } from "./config";
+import { loadConfig } from "./config.js";
 import {
   AllProvidersFailedError,
   classifyError,
   friendlyMessage,
   RateLimitError,
-} from "./errors";
-import { createGoogleProvider } from "./providers/google";
-import { createGroqProvider } from "./providers/groq";
-import { getModelsFor, getRegistry } from "./registry";
-import { getSemaphore } from "./semaphore";
-import type { Provider, ProviderConfig } from "./types";
+} from "./errors.js";
+import { createGoogleProvider } from "./providers/google.js";
+import { createGroqProvider } from "./providers/groq.js";
+import { getModelsFor, getRegistry } from "./registry.js";
+import { getSemaphore } from "./semaphore.js";
+import type { Provider, ProviderConfig } from "./types.js";
 
 // Registry of provider factories. Adding a new provider = one line here plus
 // a block in providers.yaml.

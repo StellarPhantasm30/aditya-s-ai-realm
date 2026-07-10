@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { loadConfig } from "./config";
-import type { ModelInfo, Provider, ProviderId } from "./types";
+import { loadConfig } from "./config.js";
+import type { ModelInfo, Provider, ProviderId } from "./types.js";
 
 interface CacheShape {
   fetchedAt: number;
