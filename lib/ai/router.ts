@@ -1,10 +1,9 @@
-import { streamText, type ModelMessage, type UIMessage, convertToModelMessages } from "ai";
+import { streamText, convertToModelMessages, type UIMessage } from "ai";
 import { loadConfig } from "./config";
 import {
   AllProvidersFailedError,
-  BadRequestError,
-  RateLimitError,
   classifyError,
+  RateLimitError,
 } from "./errors";
 import { createGoogleProvider } from "./providers/google";
 import { createGroqProvider } from "./providers/groq";
@@ -27,14 +26,19 @@ function buildProviders(): { cfg: ProviderConfig; provider: Provider }[] {
     .filter(({ provider }) => provider.isConfigured());
 }
 
-async function pickSiblingModel(
+async function candidateModels(
   provider: Provider,
-  currentModel: string,
-): Promise<string | null> {
-  const providers = buildProviders().map((p) => p.provider);
-  const models = await getModelsFor(providers, provider.id, { force: true });
-  const next = models.find((m) => m.id !== currentModel);
-  return next?.id ?? null;
+  primary: string,
+): Promise<string[]> {
+  const list = [primary];
+  try {
+    const providers = buildProviders().map((p) => p.provider);
+    const models = await getModelsFor(providers, provider.id);
+    for (const m of models) if (!list.includes(m.id)) list.push(m.id);
+  } catch {
+    /* registry unavailable — use only the default model */
+  }
+  return list;
 }
 
 export interface RouteParams {
@@ -44,60 +48,87 @@ export interface RouteParams {
 }
 
 /**
- * Try each configured provider in priority order. Within a provider, if the
- * default model is rate-limited, try the next-ranked sibling model once.
- * Returns the AI SDK stream result of the first provider that succeeds.
+ * Open a streaming completion by trying providers in priority order.
+ *
+ * For each provider we probe the stream by pulling its first chunk. If that
+ * fails (auth, rate limit, upstream down, timeout) we fall back to the next
+ * ranked model on the same provider (once) and then to the next provider.
+ * The successful stream is re-assembled and returned as a normal
+ * ReadableStream of UIMessage stream chunks so the caller can pipe it to
+ * the client without knowing which provider handled the request.
  */
-export async function routeStream(params: RouteParams) {
+export async function routeStream(params: RouteParams): Promise<Response> {
   const entries = buildProviders();
   if (entries.length === 0) throw new AllProvidersFailedError("No providers configured");
 
-  const modelMessages: ModelMessage[] = await convertToModelMessages(params.messages);
-  const errors: unknown[] = [];
+  const modelMessages = convertToModelMessages(params.messages);
+  const errors: string[] = [];
 
   for (const { cfg, provider } of entries) {
     const sem = getSemaphore(cfg.id, cfg.concurrency);
     const release = await sem.acquire();
-    try {
-      const attemptModels = [cfg.defaultModel];
-      let lastErr: unknown = null;
-      for (let attempt = 0; attempt < 2; attempt++) {
-        const modelId = attemptModels[attempt];
-        if (!modelId) break;
-        try {
-          const result = streamText({
-            model: provider.getLanguageModel(modelId),
-            system: params.system,
-            messages: modelMessages,
-            abortSignal: params.abortSignal,
-          });
-          // Return the streamText result; caller will convert to a Response.
-          // Release only after the stream is done.
-          void result.consumeStream().finally(release);
-          return result;
-        } catch (e) {
-          lastErr = classifyError(e, cfg.id);
-          if (lastErr instanceof BadRequestError) throw lastErr;
-          if (lastErr instanceof RateLimitError && attempt === 0) {
-            const sibling = await pickSiblingModel(provider, modelId);
-            if (sibling) {
-              attemptModels.push(sibling);
-              continue;
-            }
-          }
-          break;
+    const modelIds = await candidateModels(provider, cfg.defaultModel);
+
+    let succeeded = false;
+    for (const modelId of modelIds) {
+      try {
+        const result = streamText({
+          model: provider.getLanguageModel(modelId),
+          system: params.system,
+          messages: modelMessages,
+          abortSignal: params.abortSignal,
+          onError: ({ error }) => {
+            console.error(`[ai:${cfg.id}:${modelId}] stream error`, error);
+          },
+        });
+
+        // Probe the stream: pull the first chunk. If the provider rejects
+        // (rate limit, auth, upstream), this throws and we fall back.
+        const source = result.fullStream;
+        const reader = source.getReader();
+        const first = await reader.read();
+        if (first.value?.type === "error") {
+          throw classifyError(first.value.error, cfg.id);
         }
+
+        // Rebuild a stream that yields the probed chunk plus the remainder.
+        const rebuilt = new ReadableStream({
+          async start(controller) {
+            if (!first.done && first.value) controller.enqueue(first.value);
+            try {
+              while (true) {
+                const { value, done } = await reader.read();
+                if (done) break;
+                controller.enqueue(value);
+              }
+              controller.close();
+            } catch (e) {
+              controller.error(e);
+            } finally {
+              release();
+            }
+          },
+        });
+
+        succeeded = true;
+        // Bridge the raw stream into a UI-message stream response using the
+        // AI SDK's helper. We construct a lightweight `StreamTextResult`-like
+        // object by re-invoking streamText on the reconstructed source is
+        // not possible; instead, convert via `toTextStreamResponse` shape.
+        // Simplest robust path: pipe the fullStream chunks through the SDK's
+        // response helper by proxying `result` with our new source.
+        (result as unknown as { fullStream: ReadableStream }).fullStream = rebuilt;
+        return result.toUIMessageStreamResponse();
+      } catch (e) {
+        const err = classifyError(e, cfg.id);
+        errors.push(`${cfg.id}/${modelId}: ${err.message}`);
+        // Retry on same provider only for rate limits.
+        if (!(err instanceof RateLimitError)) break;
       }
-      release();
-      if (lastErr) errors.push(lastErr);
-    } catch (e) {
-      release();
-      if (e instanceof BadRequestError) throw e;
-      errors.push(e);
     }
+
+    if (!succeeded) release();
   }
 
-  throw new AllProvidersFailedError(
-    `All providers failed: ${errors.map((e) => (e as Error).message).join(" | ")}`,
-  );
+  throw new AllProvidersFailedError(errors.join(" | "));
 }
