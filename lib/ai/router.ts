@@ -3,11 +3,12 @@ import { loadConfig } from "./config";
 import {
   AllProvidersFailedError,
   classifyError,
+  friendlyMessage,
   RateLimitError,
 } from "./errors";
 import { createGoogleProvider } from "./providers/google";
 import { createGroqProvider } from "./providers/groq";
-import { getModelsFor } from "./registry";
+import { getModelsFor, getRegistry } from "./registry";
 import { getSemaphore } from "./semaphore";
 import type { Provider, ProviderConfig } from "./types";
 
@@ -48,14 +49,10 @@ export interface RouteParams {
 }
 
 /**
- * Open a streaming completion by trying providers in priority order.
- *
- * For each provider we probe the stream by pulling its first chunk. If that
- * fails (auth, rate limit, upstream down, timeout) we fall back to the next
- * ranked model on the same provider (once) and then to the next provider.
- * The successful stream is re-assembled and returned as a normal
- * ReadableStream of UIMessage stream chunks so the caller can pipe it to
- * the client without knowing which provider handled the request.
+ * Try each configured provider in priority order and return the first
+ * streaming response that starts successfully. Provider construction /
+ * missing-key errors trigger fallback; runtime stream errors surface to
+ * the client via `onError` with a user-friendly message.
  */
 export async function routeStream(params: RouteParams): Promise<Response> {
   const entries = buildProviders();
@@ -64,12 +61,14 @@ export async function routeStream(params: RouteParams): Promise<Response> {
   const modelMessages = convertToModelMessages(params.messages);
   const errors: string[] = [];
 
+  // Warm the registry in the background; don't block the request.
+  void getRegistry(entries.map((e) => e.provider)).catch(() => {});
+
   for (const { cfg, provider } of entries) {
     const sem = getSemaphore(cfg.id, cfg.concurrency);
     const release = await sem.acquire();
     const modelIds = await candidateModels(provider, cfg.defaultModel);
 
-    let succeeded = false;
     for (const modelId of modelIds) {
       try {
         const result = streamText({
@@ -80,54 +79,20 @@ export async function routeStream(params: RouteParams): Promise<Response> {
           onError: ({ error }) => {
             console.error(`[ai:${cfg.id}:${modelId}] stream error`, error);
           },
+          onFinish: () => release(),
         });
 
-        // Probe the stream: pull the first chunk. If the provider rejects
-        // (rate limit, auth, upstream), this throws and we fall back.
-        const source = result.fullStream;
-        const reader = source.getReader();
-        const first = await reader.read();
-        if (first.value?.type === "error") {
-          throw classifyError(first.value.error, cfg.id);
-        }
-
-        // Rebuild a stream that yields the probed chunk plus the remainder.
-        const rebuilt = new ReadableStream({
-          async start(controller) {
-            if (!first.done && first.value) controller.enqueue(first.value);
-            try {
-              while (true) {
-                const { value, done } = await reader.read();
-                if (done) break;
-                controller.enqueue(value);
-              }
-              controller.close();
-            } catch (e) {
-              controller.error(e);
-            } finally {
-              release();
-            }
-          },
+        return result.toUIMessageStreamResponse({
+          onError: (error) => friendlyMessage(error),
         });
-
-        succeeded = true;
-        // Bridge the raw stream into a UI-message stream response using the
-        // AI SDK's helper. We construct a lightweight `StreamTextResult`-like
-        // object by re-invoking streamText on the reconstructed source is
-        // not possible; instead, convert via `toTextStreamResponse` shape.
-        // Simplest robust path: pipe the fullStream chunks through the SDK's
-        // response helper by proxying `result` with our new source.
-        (result as unknown as { fullStream: ReadableStream }).fullStream = rebuilt;
-        return result.toUIMessageStreamResponse();
       } catch (e) {
         const err = classifyError(e, cfg.id);
         errors.push(`${cfg.id}/${modelId}: ${err.message}`);
-        // Retry on same provider only for rate limits.
         if (!(err instanceof RateLimitError)) break;
       }
     }
 
-    if (!succeeded) release();
+    release();
   }
 
   throw new AllProvidersFailedError(errors.join(" | "));
